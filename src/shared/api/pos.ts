@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { Product } from "@/entities/product";
+import type { Category, Product } from "@/entities/product";
 import type { Transaction } from "@/entities/transaction";
 
 /** Typed wrappers over Tauri commands. Only callable inside the Tauri runtime. */
@@ -8,6 +8,12 @@ export const productApi = {
   get: (id: string) => invoke<Product | null>("get_product", { id }),
   save: (product: Product) => invoke<void>("save_product", { product }),
   remove: (id: string) => invoke<void>("delete_product", { id }),
+};
+
+export const categoryApi = {
+  list: () => invoke<Category[]>("list_categories"),
+  save: (category: Category) => invoke<void>("save_category", { category }),
+  remove: (id: string) => invoke<void>("delete_category", { id }),
 };
 
 export const transactionApi = {
