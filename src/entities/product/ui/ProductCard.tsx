@@ -1,3 +1,4 @@
+import { ImageIcon } from "lucide-react";
 import type { Product } from "../model/types";
 import { formatRupiah } from "@/shared/lib/currency";
 import { StockBadge } from "./StockBadge";
@@ -16,26 +17,24 @@ export function ProductCard({ product, onSelect }: ProductCardProps) {
       type="button"
       disabled={soldOut}
       onClick={() => onSelect?.(product)}
-      className="flex flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white text-left transition hover:border-neutral-300 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
+      className="group flex cursor-pointer flex-col overflow-hidden rounded-xl border border-border bg-surface text-left transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0 disabled:hover:shadow-none"
     >
-      <div className="aspect-square w-full bg-neutral-100">
+      <div className="aspect-square w-full bg-surface-2">
         {product.imagePath ? (
           <img
             src={product.imagePath}
             alt={product.name}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-neutral-300">
-            <span className="text-3xl">🛒</span>
+          <div className="flex h-full w-full items-center justify-center text-muted/40">
+            <ImageIcon className="h-8 w-8" strokeWidth={1.5} />
           </div>
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-1 p-2">
-        <span className="line-clamp-2 text-sm font-medium text-neutral-900">{product.name}</span>
-        <span className="text-sm font-semibold text-neutral-700">
-          {formatRupiah(product.price)}
-        </span>
+      <div className="flex flex-1 flex-col gap-1 p-2.5">
+        <span className="line-clamp-2 text-sm font-medium text-fg">{product.name}</span>
+        <span className="text-sm font-semibold text-primary">{formatRupiah(product.price)}</span>
         <div className="mt-auto pt-1">
           <StockBadge stock={product.stock} />
         </div>

@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { Clock, QrCode } from "lucide-react";
 import type { Payment } from "@/entities/transaction";
 import { formatRupiah } from "@/shared/lib/currency";
+import { Button } from "@/shared/ui/Button";
 
 interface QrisStaticPanelProps {
   total: number;
@@ -19,52 +21,50 @@ export function QrisStaticPanel({ total, qrImagePath, onConfirm, onCancel }: Qri
 
   return (
     <div className="space-y-4">
-      <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-        Menunggu Konfirmasi Kasir — cek notifikasi pembayaran masuk sebelum konfirmasi.
+      <div className="flex items-center gap-2 rounded-lg bg-warning-bg px-3 py-2.5 text-sm text-warning-fg">
+        <Clock className="h-4 w-4 shrink-0" />
+        <span>Menunggu Konfirmasi Kasir — cek notifikasi pembayaran masuk dulu.</span>
       </div>
 
       <div className="flex flex-col items-center gap-2">
         {qrImagePath ? (
-          <img src={qrImagePath} alt="QRIS" className="h-48 w-48 object-contain" />
+          <img src={qrImagePath} alt="QRIS" className="h-48 w-48 rounded-lg object-contain" />
         ) : (
-          <div className="flex h-48 w-48 items-center justify-center rounded-md border-2 border-dashed border-neutral-300 text-center text-sm text-neutral-400">
+          <div className="flex h-48 w-48 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border text-center text-sm text-muted">
+            <QrCode className="h-10 w-10" strokeWidth={1.5} />
             QRIS statis
-            <br />
-            (atur di Pengaturan)
+            <span className="text-xs">(atur di Pengaturan)</span>
           </div>
         )}
-        <p className="text-sm text-neutral-600">Scan &amp; bayar sejumlah</p>
-        <p className="text-2xl font-bold tabular-nums">{formatRupiah(total)}</p>
+        <p className="text-sm text-muted">Scan &amp; bayar sejumlah</p>
+        <p className="text-2xl font-bold tabular-nums text-fg">{formatRupiah(total)}</p>
       </div>
 
-      <label className="flex items-start gap-2 text-sm text-neutral-700">
+      <label className="flex items-start gap-2 rounded-lg border border-border p-3 text-sm text-fg">
         <input
           type="checkbox"
           checked={checked}
           onChange={(e) => setChecked(e.target.checked)}
-          className="mt-0.5"
+          className="mt-0.5 accent-[var(--color-primary)]"
         />
         <span>Saya sudah cek notifikasi dan pembayaran sudah masuk.</span>
       </label>
 
       <div className="flex gap-2">
         {onCancel && (
-          <button
-            type="button"
-            onClick={onCancel}
-            className="flex-1 rounded-md border border-neutral-300 py-2.5 font-medium hover:bg-neutral-100"
-          >
+          <Button variant="outline" size="lg" onClick={onCancel} className="flex-1">
             Batal
-          </button>
+          </Button>
         )}
-        <button
-          type="button"
+        <Button
+          variant="accent"
+          size="lg"
           disabled={!checked}
           onClick={() => onConfirm({ method: "qris", amountPaid: total, change: 0 })}
-          className="flex-1 rounded-md bg-emerald-600 py-2.5 font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex-1"
         >
-          Konfirmasi Pembayaran Diterima
-        </button>
+          Konfirmasi Diterima
+        </Button>
       </div>
     </div>
   );

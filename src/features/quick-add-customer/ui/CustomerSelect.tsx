@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { UserPlus } from "lucide-react";
 import { useCustomerStore } from "@/entities/customer";
 import { useCartStore } from "@/entities/transaction";
 
@@ -12,6 +13,9 @@ export function CustomerSelect() {
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+
+  const input =
+    "min-w-0 rounded-md border border-border bg-surface px-2 py-1.5 text-sm text-fg outline-none focus:border-primary";
 
   function save(e: React.FormEvent) {
     e.preventDefault();
@@ -31,7 +35,7 @@ export function CustomerSelect() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Nama pelanggan"
-          className="min-w-0 flex-1 rounded-md border border-neutral-300 px-2 py-1 text-sm outline-none focus:border-neutral-500"
+          className={`flex-1 ${input}`}
           autoFocus
         />
         <input
@@ -39,15 +43,18 @@ export function CustomerSelect() {
           onChange={(e) => setPhone(e.target.value)}
           placeholder="No. HP"
           inputMode="tel"
-          className="w-28 rounded-md border border-neutral-300 px-2 py-1 text-sm outline-none focus:border-neutral-500"
+          className={`w-28 ${input}`}
         />
-        <button type="submit" className="rounded-md bg-neutral-900 px-2 py-1 text-sm text-white">
+        <button
+          type="submit"
+          className="cursor-pointer rounded-md bg-primary px-2.5 py-1.5 text-sm font-medium text-on-primary transition-colors hover:bg-primary-hover"
+        >
           Simpan
         </button>
         <button
           type="button"
           onClick={() => setAdding(false)}
-          className="text-sm text-neutral-500 hover:text-neutral-800"
+          className="cursor-pointer text-sm text-muted transition-colors hover:text-fg"
         >
           Batal
         </button>
@@ -60,7 +67,7 @@ export function CustomerSelect() {
       <select
         value={customerId ?? ""}
         onChange={(e) => setCustomer(e.target.value || null)}
-        className="min-w-0 flex-1 rounded-md border border-neutral-300 px-2 py-1 text-sm outline-none focus:border-neutral-500"
+        className={`flex-1 ${input}`}
       >
         <option value="">Pelanggan umum</option>
         {customers.map((c) => (
@@ -73,9 +80,10 @@ export function CustomerSelect() {
       <button
         type="button"
         onClick={() => setAdding(true)}
-        className="whitespace-nowrap rounded-md border border-neutral-300 px-2 py-1 text-sm hover:bg-neutral-100"
+        className="flex cursor-pointer items-center gap-1 whitespace-nowrap rounded-md border border-border px-2.5 py-1.5 text-sm text-fg transition-colors hover:bg-surface-2"
       >
-        + Baru
+        <UserPlus className="h-4 w-4" />
+        Baru
       </button>
     </div>
   );

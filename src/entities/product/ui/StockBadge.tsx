@@ -6,14 +6,10 @@ interface StockBadgeProps {
 export function StockBadge({ stock }: StockBadgeProps) {
   const { label, cls } =
     stock <= 0
-      ? { label: "Habis", cls: "bg-red-100 text-red-700" }
+      ? { label: "Habis", cls: "badge-danger" }
       : stock <= 5
-        ? { label: `Sisa ${stock}`, cls: "bg-amber-100 text-amber-700" }
-        : { label: `Stok ${stock}`, cls: "bg-emerald-100 text-emerald-700" };
+        ? { label: `Sisa ${stock}`, cls: "badge-warning" }
+        : { label: `Stok ${stock}`, cls: "badge-success" };
 
-  return (
-    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${cls}`}>
-      {label}
-    </span>
-  );
+  return <span className={`badge ${cls}`}>{label}</span>;
 }

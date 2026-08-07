@@ -9,10 +9,10 @@ interface CategoryFilterProps {
 /** Horizontal chip filter. null = "Semua". */
 export function CategoryFilter({ categories, selected, onSelect }: CategoryFilterProps) {
   const chip = (active: boolean) =>
-    `whitespace-nowrap rounded-full px-3 py-1 text-sm font-medium transition ${
+    `cursor-pointer whitespace-nowrap rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 ${
       active
-        ? "bg-neutral-900 text-white"
-        : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+        ? "bg-primary text-on-primary"
+        : "bg-surface-2 text-muted hover:bg-border hover:text-fg"
     }`;
 
   return (
