@@ -60,6 +60,12 @@ pub fn list(conn: &Connection) -> rusqlite::Result<Vec<Transaction>> {
         .collect()
 }
 
+pub fn delete(conn: &Connection, id: &str) -> rusqlite::Result<()> {
+    // transaction_items cascade via FK ON DELETE CASCADE.
+    conn.execute("DELETE FROM transactions WHERE id = ?1", params![id])?;
+    Ok(())
+}
+
 pub fn get(conn: &Connection, id: &str) -> rusqlite::Result<Option<Transaction>> {
     let mut stmt = conn.prepare(
         "SELECT id, created_at, cashier_id, customer_id, status, discount_total, tax_rate,

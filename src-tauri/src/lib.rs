@@ -40,6 +40,7 @@ pub fn run() {
             commands::transaction::create_transaction,
             commands::transaction::list_transactions,
             commands::transaction::get_transaction,
+            commands::transaction::delete_transaction,
             commands::printer::print_receipt,
         ])
         .run(tauri::generate_context!())

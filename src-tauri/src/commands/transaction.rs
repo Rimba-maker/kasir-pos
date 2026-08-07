@@ -22,3 +22,10 @@ pub fn get_transaction(state: State<AppState>, id: String) -> Result<Option<Tran
     let conn = state.db.lock().map_err(|e| e.to_string())?;
     transaction_repo::get(&conn, &id).map_err(|e| e.to_string())
 }
+
+/// Used when resuming a held sale — the held record is removed after load.
+#[tauri::command]
+pub fn delete_transaction(state: State<AppState>, id: String) -> Result<(), String> {
+    let conn = state.db.lock().map_err(|e| e.to_string())?;
+    transaction_repo::delete(&conn, &id).map_err(|e| e.to_string())
+}

@@ -20,6 +20,7 @@ export const transactionApi = {
   create: (tx: Transaction) => invoke<void>("create_transaction", { tx }),
   list: () => invoke<Transaction[]>("list_transactions"),
   get: (id: string) => invoke<Transaction | null>("get_transaction", { id }),
+  remove: (id: string) => invoke<void>("delete_transaction", { id }),
 };
 
 /** True when running inside the Tauri desktop shell (vs. plain browser dev). */
