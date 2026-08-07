@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Banknote, PauseCircle, Printer, QrCode } from "lucide-react";
 import { useCatalogStore } from "@/entities/product";
 import { useSettingsStore } from "@/entities/store-settings";
 import { buildTransaction, cartTotals, useCartStore, useSalesStore, type Payment } from "@/entities/transaction";
@@ -11,6 +12,7 @@ import { ProductGrid } from "@/widgets/product-grid";
 import { CartPanel } from "@/widgets/cart-panel";
 import { ReceiptPreview } from "@/widgets/receipt-preview";
 import { transactionApi, isTauri } from "@/shared/api/pos";
+import { Button } from "@/shared/ui/Button";
 import { Modal } from "@/shared/ui/Modal";
 
 type PayStep = null | "choose" | "cash" | "qris";
@@ -76,20 +78,19 @@ export function TillPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-neutral-50">
-      <header className="flex items-center justify-between border-b border-neutral-200 bg-white px-4 py-3">
-        <h1 className="text-lg font-bold">Kasir POS</h1>
-        <button
-          type="button"
-          onClick={onHold}
-          disabled={lines.length === 0}
-          className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium hover:bg-neutral-100 disabled:opacity-40"
-        >
-          Tahan Transaksi
-        </button>
+    <div className="flex h-screen flex-col bg-bg">
+      <header className="flex items-center justify-between border-b border-border bg-surface px-4 py-3">
+        <div>
+          <h1 className="text-lg font-bold leading-tight text-fg">{settings.name || "Kasir"}</h1>
+          <p className="text-xs text-muted">Transaksi kasir</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={onHold} disabled={lines.length === 0}>
+          <PauseCircle className="h-4 w-4" />
+          Tahan
+        </Button>
       </header>
 
-      <div className="grid flex-1 grid-cols-1 gap-4 overflow-hidden p-4 lg:grid-cols-[1fr_380px]">
+      <div className="grid flex-1 grid-cols-1 gap-4 overflow-hidden p-4 lg:grid-cols-[1fr_384px]">
         <div className="flex min-h-0 flex-col gap-3">
           <BarcodeSearch />
           <div className="min-h-0 flex-1">
@@ -107,16 +108,18 @@ export function TillPage() {
           <button
             type="button"
             onClick={() => setStep("cash")}
-            className="rounded-lg border border-neutral-300 py-6 font-medium hover:bg-neutral-50"
+            className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-border py-6 font-medium text-fg transition-colors hover:border-primary hover:bg-surface-2"
           >
-            💵 Tunai
+            <Banknote className="h-7 w-7 text-primary" strokeWidth={1.75} />
+            Tunai
           </button>
           <button
             type="button"
             onClick={() => setStep("qris")}
-            className="rounded-lg border border-neutral-300 py-6 font-medium hover:bg-neutral-50"
+            className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border border-border py-6 font-medium text-fg transition-colors hover:border-primary hover:bg-surface-2"
           >
-            📱 QRIS
+            <QrCode className="h-7 w-7 text-primary" strokeWidth={1.75} />
+            QRIS
           </button>
         </div>
       </Modal>
@@ -140,20 +143,13 @@ export function TillPage() {
           <div className="space-y-4">
             <ReceiptPreview data={receipt} />
             <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setReceipt(null)}
-                className="flex-1 rounded-md border border-neutral-300 py-2.5 font-medium hover:bg-neutral-100"
-              >
+              <Button variant="outline" size="lg" onClick={() => setReceipt(null)} className="flex-1">
                 Selesai
-              </button>
-              <button
-                type="button"
-                onClick={onPrint}
-                className="flex-1 rounded-md bg-neutral-900 py-2.5 font-medium text-white hover:bg-neutral-800"
-              >
+              </Button>
+              <Button variant="primary" size="lg" onClick={onPrint} className="flex-1">
+                <Printer className="h-4 w-4" />
                 Cetak Struk
-              </button>
+              </Button>
             </div>
           </div>
         )}

@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { Pencil, Plus, Tags, Trash2 } from "lucide-react";
 import { StockBadge, useCatalogStore, type Product } from "@/entities/product";
 import { ProductForm, deleteProduct, deleteProducts } from "@/features/manage-product";
 import { CategoryManager } from "@/features/manage-category";
 import { formatRupiah } from "@/shared/lib/currency";
+import { Button } from "@/shared/ui/Button";
 import { Modal } from "@/shared/ui/Modal";
 
 export function CatalogPage() {
@@ -30,86 +32,86 @@ export function CatalogPage() {
   }
 
   return (
-    <div className="flex h-full flex-col gap-4 p-4">
+    <div className="flex h-full flex-col gap-4 p-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-bold">Katalog Produk</h1>
+        <div>
+          <h1 className="text-xl font-bold text-fg">Katalog Produk</h1>
+          <p className="text-sm text-muted">{products.length} produk</p>
+        </div>
         <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setShowCategories(true)}
-            className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium hover:bg-neutral-100"
-          >
-            Kelola Kategori
-          </button>
+          <Button variant="outline" size="sm" onClick={() => setShowCategories(true)}>
+            <Tags className="h-4 w-4" />
+            Kategori
+          </Button>
           {selected.size > 0 && (
-            <button
-              type="button"
-              onClick={bulkDelete}
-              className="rounded-md border border-red-300 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-100"
-            >
-              Hapus {selected.size} terpilih
-            </button>
+            <Button variant="danger" size="sm" onClick={bulkDelete}>
+              <Trash2 className="h-4 w-4" />
+              Hapus {selected.size}
+            </Button>
           )}
-          <button
-            type="button"
-            onClick={() => setEditing(null)}
-            className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-neutral-800"
-          >
-            + Produk
-          </button>
+          <Button variant="primary" size="sm" onClick={() => setEditing(null)}>
+            <Plus className="h-4 w-4" />
+            Produk
+          </Button>
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-auto rounded-lg border border-neutral-200 bg-white">
+      <div className="min-h-0 flex-1 overflow-auto rounded-xl border border-border bg-surface">
         <table className="w-full text-sm">
-          <thead className="sticky top-0 bg-neutral-50 text-left text-neutral-500">
+          <thead className="sticky top-0 bg-surface-2 text-left text-muted">
             <tr>
-              <th className="w-10 px-3 py-2"></th>
-              <th className="px-3 py-2">Nama</th>
-              <th className="px-3 py-2">Kategori</th>
-              <th className="px-3 py-2 text-right">Harga</th>
-              <th className="px-3 py-2">Stok</th>
-              <th className="px-3 py-2"></th>
+              <th className="w-10 px-3 py-2.5"></th>
+              <th className="px-3 py-2.5 font-medium">Nama</th>
+              <th className="px-3 py-2.5 font-medium">Kategori</th>
+              <th className="px-3 py-2.5 text-right font-medium">Harga</th>
+              <th className="px-3 py-2.5 font-medium">Stok</th>
+              <th className="px-3 py-2.5"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-100">
+          <tbody className="divide-y divide-border">
             {products.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-3 py-8 text-center text-neutral-400">
+                <td colSpan={6} className="px-3 py-10 text-center text-muted">
                   Belum ada produk.
                 </td>
               </tr>
             ) : (
               products.map((p) => (
-                <tr key={p.id} className="hover:bg-neutral-50">
-                  <td className="px-3 py-2">
+                <tr key={p.id} className="transition-colors hover:bg-surface-2/60">
+                  <td className="px-3 py-2.5">
                     <input
                       type="checkbox"
                       checked={selected.has(p.id)}
                       onChange={() => toggle(p.id)}
+                      className="accent-[var(--color-primary)]"
+                      aria-label={`Pilih ${p.name}`}
                     />
                   </td>
-                  <td className="px-3 py-2 font-medium">{p.name}</td>
-                  <td className="px-3 py-2 text-neutral-600">{categoryName(p.categoryId)}</td>
-                  <td className="px-3 py-2 text-right tabular-nums">{formatRupiah(p.price)}</td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-2.5 font-medium text-fg">{p.name}</td>
+                  <td className="px-3 py-2.5 text-muted">{categoryName(p.categoryId)}</td>
+                  <td className="px-3 py-2.5 text-right tabular-nums text-fg">{formatRupiah(p.price)}</td>
+                  <td className="px-3 py-2.5">
                     <StockBadge stock={p.stock} />
                   </td>
-                  <td className="px-3 py-2 text-right">
-                    <button
-                      type="button"
-                      onClick={() => setEditing(p)}
-                      className="text-neutral-500 hover:text-neutral-900"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => deleteProduct(p.id)}
-                      className="ml-3 text-neutral-400 hover:text-red-600"
-                    >
-                      Hapus
-                    </button>
+                  <td className="px-3 py-2.5">
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setEditing(p)}
+                        className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-2 hover:text-fg"
+                        aria-label={`Edit ${p.name}`}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteProduct(p.id)}
+                        className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-muted transition-colors hover:bg-danger-bg hover:text-danger"
+                        aria-label={`Hapus ${p.name}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -124,11 +126,7 @@ export function CatalogPage() {
         onClose={() => setEditing(undefined)}
       >
         {editing !== undefined && (
-          <ProductForm
-            product={editing}
-            categories={categories}
-            onDone={() => setEditing(undefined)}
-          />
+          <ProductForm product={editing} categories={categories} onDone={() => setEditing(undefined)} />
         )}
       </Modal>
 
