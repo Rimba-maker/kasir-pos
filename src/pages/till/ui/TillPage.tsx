@@ -46,6 +46,7 @@ export function TillPage() {
       taxRate: cart.taxRate,
       status: "paid",
       payment,
+      customerId: cart.customerId,
     });
     try {
       if (isTauri()) await transactionApi.create(tx);
