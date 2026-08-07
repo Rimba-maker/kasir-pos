@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useCatalogStore } from "@/entities/product";
 import { TillPage } from "@/pages/till";
 import { CatalogPage } from "@/pages/catalog";
+import { SalesHistoryPage } from "@/pages/sales-history";
 import { categoryApi, productApi, isTauri } from "@/shared/api/pos";
 import { demoCategories, demoProducts } from "./demo-data";
 
@@ -52,7 +53,7 @@ export function App() {
       <main className="min-w-0 flex-1">
         {route === "till" && <TillPage />}
         {route === "catalog" && <CatalogPage />}
-        {route === "sales" && <Placeholder label="Riwayat & Laporan" />}
+        {route === "sales" && <SalesHistoryPage onResumed={() => setRoute("till")} />}
         {route === "staff" && <Placeholder label="Manajemen Staff" />}
         {route === "settings" && <Placeholder label="Pengaturan Toko" />}
       </main>

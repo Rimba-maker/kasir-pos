@@ -24,6 +24,8 @@ interface CartState {
   setLineDiscount: (productId: string, discount: number) => void;
   setDiscountTotal: (amount: number) => void;
   setTaxRate: (rate: number) => void;
+  /** Replace the whole cart (used when resuming a held sale). */
+  loadDraft: (draft: { lines: CartLine[]; discountTotal: number; taxRate: number }) => void;
   clear: () => void;
 }
 
@@ -77,6 +79,12 @@ export const useCartStore = create<CartState>((set) => ({
 
   setDiscountTotal: (amount) => set({ discountTotal: Math.max(0, amount) }),
   setTaxRate: (rate) => set({ taxRate: Math.max(0, rate) }),
+  loadDraft: (draft) =>
+    set({
+      lines: draft.lines.map((l) => ({ ...l })),
+      discountTotal: draft.discountTotal,
+      taxRate: draft.taxRate,
+    }),
   clear: () => set({ lines: [], discountTotal: 0, taxRate: 0 }),
 }));
 

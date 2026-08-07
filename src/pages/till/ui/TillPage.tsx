@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useCatalogStore } from "@/entities/product";
-import { buildTransaction, cartTotals, useCartStore, type Payment } from "@/entities/transaction";
+import { buildTransaction, cartTotals, useCartStore, useSalesStore, type Payment } from "@/entities/transaction";
 import { BarcodeSearch } from "@/features/add-to-cart";
+import { holdSale } from "@/features/hold-resume-sale";
 import { CashPaymentPad } from "@/features/pay-cash";
 import { QrisStaticPanel } from "@/features/pay-qris-static";
 import { buildReceiptData, printReceipt, type ReceiptData, type StoreInfo } from "@/features/print-receipt";
@@ -25,38 +26,31 @@ export function TillPage() {
   const taxRate = useCartStore((s) => s.taxRate);
   const { total } = cartTotals({ lines, discountTotal, taxRate });
 
-  async function finalize(status: "paid" | "held", payment: Payment | null) {
+  async function onPaymentConfirmed(payment: Payment) {
     const cart = useCartStore.getState();
     const tx = buildTransaction({
       lines: cart.lines,
       discountTotal: cart.discountTotal,
       taxRate: cart.taxRate,
-      status,
+      status: "paid",
       payment,
     });
     try {
       if (isTauri()) await transactionApi.create(tx);
     } catch (e) {
       alert(`Gagal menyimpan transaksi: ${String(e)}`);
-      return null;
+      return;
     }
-    if (status === "paid") {
-      const dec = useCatalogStore.getState().decrementStock;
-      tx.items.forEach((i) => dec(i.productId, i.qty));
-    }
+    const dec = useCatalogStore.getState().decrementStock;
+    tx.items.forEach((i) => dec(i.productId, i.qty));
+    useSalesStore.getState().add(tx);
     cart.clear();
-    return tx;
-  }
-
-  async function onPaymentConfirmed(payment: Payment) {
-    const tx = await finalize("paid", payment);
     setStep(null);
-    if (tx) setReceipt(buildReceiptData(tx, STORE));
+    setReceipt(buildReceiptData(tx, STORE));
   }
 
   async function onHold() {
-    if (lines.length === 0) return;
-    await finalize("held", null);
+    await holdSale();
   }
 
   async function onPrint() {
