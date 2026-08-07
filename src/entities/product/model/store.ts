@@ -8,6 +8,9 @@ interface CatalogState {
   setCategories: (categories: Category[]) => void;
   upsertProduct: (product: Product) => void;
   removeProduct: (id: string) => void;
+  removeProducts: (ids: string[]) => void;
+  upsertCategory: (category: Category) => void;
+  removeCategory: (id: string) => void;
   /** Local stock decrement after a confirmed sale. Backend remains source of truth. */
   decrementStock: (id: string, qty: number) => void;
 }
@@ -26,6 +29,25 @@ export const useCatalogStore = create<CatalogState>((set) => ({
       return { products: next };
     }),
   removeProduct: (id) => set((s) => ({ products: s.products.filter((p) => p.id !== id) })),
+  removeProducts: (ids) =>
+    set((s) => {
+      const drop = new Set(ids);
+      return { products: s.products.filter((p) => !drop.has(p.id)) };
+    }),
+  upsertCategory: (category) =>
+    set((s) => {
+      const i = s.categories.findIndex((c) => c.id === category.id);
+      if (i === -1) return { categories: [...s.categories, category] };
+      const next = s.categories.slice();
+      next[i] = category;
+      return { categories: next };
+    }),
+  removeCategory: (id) =>
+    set((s) => ({
+      categories: s.categories.filter((c) => c.id !== id),
+      // orphaned products fall back to "uncategorized"
+      products: s.products.map((p) => (p.categoryId === id ? { ...p, categoryId: null } : p)),
+    })),
   decrementStock: (id, qty) =>
     set((s) => ({
       products: s.products.map((p) =>
