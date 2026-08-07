@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Search } from "lucide-react";
 import { useCatalogStore } from "@/entities/product";
 import { addProductToCart } from "../model/add-to-cart";
 
@@ -21,12 +22,13 @@ export function BarcodeSearch() {
   }
 
   return (
-    <form onSubmit={submit}>
+    <form onSubmit={submit} className="relative">
+      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Scan barcode / cari produk, tekan Enter"
-        className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-500"
+        className="w-full rounded-lg border border-border bg-surface py-2.5 pl-9 pr-3 text-sm text-fg outline-none transition-colors placeholder:text-muted focus:border-primary"
         autoFocus
       />
     </form>

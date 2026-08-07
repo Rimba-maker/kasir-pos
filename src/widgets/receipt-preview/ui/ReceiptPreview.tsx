@@ -8,7 +8,7 @@ interface ReceiptPreviewProps {
 /** Thermal-style receipt preview (58mm look). Mirrors the ESC/POS layout. */
 export function ReceiptPreview({ data }: ReceiptPreviewProps) {
   return (
-    <div className="mx-auto max-w-[280px] rounded-md bg-white p-4 font-mono text-xs text-neutral-900 shadow-sm">
+    <div className="mx-auto max-w-[280px] rounded-lg border border-border bg-white p-4 font-mono text-xs text-neutral-900 shadow-sm">
       <div className="text-center">
         <p className="font-bold uppercase">{data.storeName}</p>
         {data.address && <p>{data.address}</p>}
