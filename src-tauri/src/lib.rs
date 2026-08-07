@@ -1,5 +1,6 @@
 mod commands;
 mod db;
+mod hardware;
 
 use rusqlite::Connection;
 use std::sync::Mutex;
@@ -36,6 +37,7 @@ pub fn run() {
             commands::transaction::create_transaction,
             commands::transaction::list_transactions,
             commands::transaction::get_transaction,
+            commands::printer::print_receipt,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
