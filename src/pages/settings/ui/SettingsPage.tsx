@@ -1,4 +1,5 @@
 import { useSettingsStore } from "@/entities/store-settings";
+import { downloadBackup } from "@/features/export-backup";
 
 export function SettingsPage() {
   const settings = useSettingsStore((s) => s.settings);
@@ -62,6 +63,20 @@ export function SettingsPage() {
             value={settings.qrisImagePath}
             onChange={(v) => update({ qrisImagePath: v })}
           />
+        </Section>
+
+        <Section title="Backup Data">
+          <p className="text-sm text-neutral-600">
+            Ekspor seluruh data (produk, transaksi, pelanggan, staff, pengaturan) ke satu file
+            JSON sebagai cadangan manual.
+          </p>
+          <button
+            type="button"
+            onClick={() => void downloadBackup()}
+            className="rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:bg-neutral-800"
+          >
+            Ekspor Backup (.json)
+          </button>
         </Section>
 
         <p className="text-xs text-neutral-400">Perubahan tersimpan otomatis di perangkat ini.</p>
