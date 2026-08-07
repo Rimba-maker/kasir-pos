@@ -4,3 +4,9 @@ target/
 .DS_Store
 *.log
 *.tsbuildinfo
+
+# Tauri generated files
+src-tauri/target/
+src-tauri/gen/
+# local SQLite data
+*.db
