@@ -1,6 +1,7 @@
 import { cartTotals, useCartStore } from "@/entities/transaction";
 import { formatRupiah } from "@/shared/lib/currency";
 import { lineTotal } from "@/entities/transaction";
+import { CustomerSelect } from "@/features/quick-add-customer";
 
 interface CartPanelProps {
   /** Called when the cashier taps "Bayar". Payment flow wires this in later steps. */
@@ -33,6 +34,10 @@ export function CartPanel({ onCheckout }: CartPanelProps) {
             Kosongkan
           </button>
         )}
+      </div>
+
+      <div className="border-b border-neutral-200 px-4 py-2">
+        <CustomerSelect />
       </div>
 
       <div className="flex-1 overflow-y-auto">

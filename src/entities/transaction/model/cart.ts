@@ -16,6 +16,8 @@ interface CartState {
   discountTotal: number;
   /** Tax rate 0..1; 0 when tax disabled. */
   taxRate: number;
+  /** Optional customer attached to this sale. */
+  customerId: string | null;
 
   addItem: (p: { id: string; name: string; price: number }, qty?: number) => void;
   setQty: (productId: string, qty: number) => void;
@@ -24,8 +26,14 @@ interface CartState {
   setLineDiscount: (productId: string, discount: number) => void;
   setDiscountTotal: (amount: number) => void;
   setTaxRate: (rate: number) => void;
+  setCustomer: (id: string | null) => void;
   /** Replace the whole cart (used when resuming a held sale). */
-  loadDraft: (draft: { lines: CartLine[]; discountTotal: number; taxRate: number }) => void;
+  loadDraft: (draft: {
+    lines: CartLine[];
+    discountTotal: number;
+    taxRate: number;
+    customerId: string | null;
+  }) => void;
   clear: () => void;
 }
 
@@ -33,6 +41,7 @@ export const useCartStore = create<CartState>((set) => ({
   lines: [],
   discountTotal: 0,
   taxRate: 0,
+  customerId: null,
 
   addItem: (p, qty = 1) =>
     set((s) => {
@@ -79,13 +88,15 @@ export const useCartStore = create<CartState>((set) => ({
 
   setDiscountTotal: (amount) => set({ discountTotal: Math.max(0, amount) }),
   setTaxRate: (rate) => set({ taxRate: Math.max(0, rate) }),
+  setCustomer: (id) => set({ customerId: id }),
   loadDraft: (draft) =>
     set({
       lines: draft.lines.map((l) => ({ ...l })),
       discountTotal: draft.discountTotal,
       taxRate: draft.taxRate,
+      customerId: draft.customerId,
     }),
-  clear: () => set({ lines: [], discountTotal: 0, taxRate: 0 }),
+  clear: () => set({ lines: [], discountTotal: 0, taxRate: 0, customerId: null }),
 }));
 
 /** Pure totals from a cart snapshot — reuses the transaction money core. */

@@ -11,6 +11,7 @@ export async function holdSale(): Promise<void> {
     taxRate: cart.taxRate,
     status: "held",
     payment: null,
+    customerId: cart.customerId,
   });
   if (isTauri()) await transactionApi.create(tx);
   useSalesStore.getState().add(tx);
@@ -29,6 +30,7 @@ export async function resumeSale(tx: Transaction): Promise<void> {
     })),
     discountTotal: tx.discountTotal,
     taxRate: tx.taxRate,
+    customerId: tx.customerId,
   });
   useSalesStore.getState().remove(tx.id);
   if (isTauri()) await transactionApi.remove(tx.id);
