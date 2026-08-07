@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kasir POS</title>
+    <script>
+      // Apply saved theme before paint to avoid a flash of the wrong palette.
+      try {
+        var t = JSON.parse(localStorage.getItem("pos-theme") || "{}").state?.theme;
+        if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
