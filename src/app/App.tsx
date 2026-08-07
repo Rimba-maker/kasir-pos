@@ -1,10 +1,21 @@
+import { useEffect } from "react";
+import { useCatalogStore } from "@/entities/product";
+import { TillPage } from "@/pages/till";
+import { productApi, isTauri } from "@/shared/api/pos";
+import { demoCategories, demoProducts } from "./demo-data";
+
 export function App() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-50 text-neutral-900">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold">Kasir POS</h1>
-        <p className="mt-2 text-neutral-500">Offline-first POS — scaffold siap.</p>
-      </div>
-    </div>
-  );
+  const setProducts = useCatalogStore((s) => s.setProducts);
+  const setCategories = useCatalogStore((s) => s.setCategories);
+
+  useEffect(() => {
+    if (isTauri()) {
+      productApi.list().then(setProducts).catch(() => {});
+    } else {
+      setCategories(demoCategories);
+      setProducts(demoProducts);
+    }
+  }, [setProducts, setCategories]);
+
+  return <TillPage />;
 }
