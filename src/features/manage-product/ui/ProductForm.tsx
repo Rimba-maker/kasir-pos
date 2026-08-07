@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Category, Product } from "@/entities/product";
+import { fileToDataUrl } from "@/shared/lib/image";
 import { saveProduct } from "../model/manage-product";
 
 interface ProductFormProps {
@@ -15,6 +16,17 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
   const [stock, setStock] = useState(product?.stock ?? 0);
   const [categoryId, setCategoryId] = useState<string | null>(product?.categoryId ?? null);
   const [barcode, setBarcode] = useState(product?.barcode ?? "");
+  const [imagePath, setImagePath] = useState<string | null>(product?.imagePath ?? null);
+
+  async function onPickImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setImagePath(await fileToDataUrl(file));
+    } catch (err) {
+      alert(`Gagal memuat gambar: ${String(err)}`);
+    }
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,7 +38,7 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
       stock: Math.max(0, Math.round(stock)),
       categoryId,
       barcode: barcode.trim() || null,
-      imagePath: product?.imagePath ?? null,
+      imagePath,
     });
     onDone();
   }
@@ -80,6 +92,32 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
         <span className="text-neutral-600">Barcode (opsional)</span>
         <input value={barcode} onChange={(e) => setBarcode(e.target.value)} className={field} />
       </label>
+
+      <div className="text-sm">
+        <span className="text-neutral-600">Foto produk</span>
+        <div className="mt-1 flex items-center gap-3">
+          <div className="h-16 w-16 shrink-0 overflow-hidden rounded-md border border-neutral-200 bg-neutral-100">
+            {imagePath ? (
+              <img src={imagePath} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-neutral-300">🛒</div>
+            )}
+          </div>
+          <div className="flex flex-col gap-1">
+            <input type="file" accept="image/*" onChange={onPickImage} className="text-xs" />
+            {imagePath && (
+              <button
+                type="button"
+                onClick={() => setImagePath(null)}
+                className="self-start text-xs text-neutral-500 hover:text-red-600"
+              >
+                Hapus foto
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
       <div className="flex gap-2 pt-1">
         <button
           type="button"
