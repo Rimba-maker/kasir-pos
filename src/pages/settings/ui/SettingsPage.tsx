@@ -1,15 +1,18 @@
+import { Download } from "lucide-react";
 import { useSettingsStore } from "@/entities/store-settings";
 import { downloadBackup } from "@/features/export-backup";
+import { Button } from "@/shared/ui/Button";
 
 export function SettingsPage() {
   const settings = useSettingsStore((s) => s.settings);
   const update = useSettingsStore((s) => s.update);
 
-  const field = "mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-500";
+  const field =
+    "mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-fg outline-none focus:border-primary";
 
   return (
-    <div className="h-full overflow-auto p-4">
-      <h1 className="mb-4 text-lg font-bold">Pengaturan Toko</h1>
+    <div className="h-full overflow-auto p-5">
+      <h1 className="mb-4 text-xl font-bold text-fg">Pengaturan Toko</h1>
 
       <div className="max-w-lg space-y-5">
         <Section title="Identitas Toko">
@@ -29,17 +32,18 @@ export function SettingsPage() {
             value={settings.currencySymbol}
             onChange={(v) => update({ currencySymbol: v })}
           />
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex items-center gap-2 text-sm text-fg">
             <input
               type="checkbox"
               checked={settings.taxEnabled}
               onChange={(e) => update({ taxEnabled: e.target.checked })}
+              className="accent-[var(--color-primary)]"
             />
             Aktifkan pajak
           </label>
           {settings.taxEnabled && (
             <label className="block text-sm">
-              <span className="text-neutral-600">Tarif pajak (%)</span>
+              <span className="text-muted">Tarif pajak (%)</span>
               <input
                 type="number"
                 min={0}
@@ -66,20 +70,17 @@ export function SettingsPage() {
         </Section>
 
         <Section title="Backup Data">
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-muted">
             Ekspor seluruh data (produk, transaksi, pelanggan, staff, pengaturan) ke satu file
             JSON sebagai cadangan manual.
           </p>
-          <button
-            type="button"
-            onClick={() => void downloadBackup()}
-            className="rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:bg-neutral-800"
-          >
+          <Button variant="primary" size="sm" onClick={() => void downloadBackup()}>
+            <Download className="h-4 w-4" />
             Ekspor Backup (.json)
-          </button>
+          </Button>
         </Section>
 
-        <p className="text-xs text-neutral-400">Perubahan tersimpan otomatis di perangkat ini.</p>
+        <p className="text-xs text-muted">Perubahan tersimpan otomatis di perangkat ini.</p>
       </div>
     </div>
   );
@@ -95,7 +96,7 @@ export function SettingsPage() {
   }) {
     return (
       <label className="block text-sm">
-        <span className="text-neutral-600">{label}</span>
+        <span className="text-muted">{label}</span>
         <input value={value} onChange={(e) => onChange(e.target.value)} className={field} />
       </label>
     );
@@ -104,8 +105,8 @@ export function SettingsPage() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="space-y-3 rounded-lg border border-neutral-200 bg-white p-4">
-      <h2 className="font-semibold">{title}</h2>
+    <section className="space-y-3 rounded-xl border border-border bg-surface p-4">
+      <h2 className="font-semibold text-fg">{title}</h2>
       {children}
     </section>
   );

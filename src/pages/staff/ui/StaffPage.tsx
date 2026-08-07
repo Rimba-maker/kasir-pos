@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { PERMISSION_LABELS, useStaffStore, type Staff, type StaffPermissions } from "@/entities/staff";
 import { StaffForm } from "@/features/manage-staff-permission";
+import { Button } from "@/shared/ui/Button";
 import { Modal } from "@/shared/ui/Modal";
 
 export function StaffPage() {
@@ -15,54 +17,65 @@ export function StaffPage() {
       .join(", ") || "—";
 
   return (
-    <div className="flex h-full flex-col gap-4 p-4">
+    <div className="flex h-full flex-col gap-4 p-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-bold">Manajemen Staff</h1>
-        <button
-          type="button"
-          onClick={() => setEditing(null)}
-          className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-neutral-800"
-        >
-          + Staff
-        </button>
+        <div>
+          <h1 className="text-xl font-bold text-fg">Manajemen Staff</h1>
+          <p className="text-sm text-muted">{staff.length} akun</p>
+        </div>
+        <Button variant="primary" size="sm" onClick={() => setEditing(null)}>
+          <Plus className="h-4 w-4" />
+          Staff
+        </Button>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-auto rounded-lg border border-neutral-200 bg-white">
+      {staff.length === 0 && (
+        <p className="rounded-lg border border-dashed border-border bg-surface p-3 text-sm text-muted">
+          Belum ada staff — selama kosong, aplikasi terbuka tanpa login. Tambahkan staff untuk
+          mengaktifkan login &amp; hak akses.
+        </p>
+      )}
+
+      <div className="min-h-0 flex-1 overflow-auto rounded-xl border border-border bg-surface">
         <table className="w-full text-sm">
-          <thead className="sticky top-0 bg-neutral-50 text-left text-neutral-500">
+          <thead className="sticky top-0 bg-surface-2 text-left text-muted">
             <tr>
-              <th className="px-3 py-2">Nama</th>
-              <th className="px-3 py-2">Hak akses</th>
-              <th className="px-3 py-2"></th>
+              <th className="px-3 py-2.5 font-medium">Nama</th>
+              <th className="px-3 py-2.5 font-medium">Hak akses</th>
+              <th className="px-3 py-2.5"></th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-100">
+          <tbody className="divide-y divide-border">
             {staff.length === 0 ? (
               <tr>
-                <td colSpan={3} className="px-3 py-8 text-center text-neutral-400">
+                <td colSpan={3} className="px-3 py-10 text-center text-muted">
                   Belum ada staff.
                 </td>
               </tr>
             ) : (
               staff.map((m) => (
-                <tr key={m.id} className="hover:bg-neutral-50">
-                  <td className="px-3 py-2 font-medium">{m.name}</td>
-                  <td className="px-3 py-2 text-neutral-600">{grantedList(m.permissions)}</td>
-                  <td className="px-3 py-2 text-right">
-                    <button
-                      type="button"
-                      onClick={() => setEditing(m)}
-                      className="text-neutral-500 hover:text-neutral-900"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => remove(m.id)}
-                      className="ml-3 text-neutral-400 hover:text-red-600"
-                    >
-                      Hapus
-                    </button>
+                <tr key={m.id} className="transition-colors hover:bg-surface-2/60">
+                  <td className="px-3 py-2.5 font-medium text-fg">{m.name}</td>
+                  <td className="px-3 py-2.5 text-muted">{grantedList(m.permissions)}</td>
+                  <td className="px-3 py-2.5">
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setEditing(m)}
+                        className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-2 hover:text-fg"
+                        aria-label={`Edit ${m.name}`}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => remove(m.id)}
+                        className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-muted transition-colors hover:bg-danger-bg hover:text-danger"
+                        aria-label={`Hapus ${m.name}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))

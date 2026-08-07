@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { ImageIcon } from "lucide-react";
 import type { Category, Product } from "@/entities/product";
 import { fileToDataUrl } from "@/shared/lib/image";
+import { Button } from "@/shared/ui/Button";
 import { saveProduct } from "../model/manage-product";
 
 interface ProductFormProps {
@@ -43,17 +45,18 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
     onDone();
   }
 
-  const field = "mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-500";
+  const field =
+    "mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-fg outline-none focus:border-primary";
 
   return (
     <form onSubmit={submit} className="space-y-3">
       <label className="block text-sm">
-        <span className="text-neutral-600">Nama produk</span>
+        <span className="text-muted">Nama produk</span>
         <input value={name} onChange={(e) => setName(e.target.value)} className={field} autoFocus />
       </label>
       <div className="grid grid-cols-2 gap-3">
         <label className="block text-sm">
-          <span className="text-neutral-600">Harga</span>
+          <span className="text-muted">Harga</span>
           <input
             type="number"
             min={0}
@@ -63,7 +66,7 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
           />
         </label>
         <label className="block text-sm">
-          <span className="text-neutral-600">Stok</span>
+          <span className="text-muted">Stok</span>
           <input
             type="number"
             min={0}
@@ -74,7 +77,7 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
         </label>
       </div>
       <label className="block text-sm">
-        <span className="text-neutral-600">Kategori</span>
+        <span className="text-muted">Kategori</span>
         <select
           value={categoryId ?? ""}
           onChange={(e) => setCategoryId(e.target.value || null)}
@@ -89,27 +92,27 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
         </select>
       </label>
       <label className="block text-sm">
-        <span className="text-neutral-600">Barcode (opsional)</span>
+        <span className="text-muted">Barcode (opsional)</span>
         <input value={barcode} onChange={(e) => setBarcode(e.target.value)} className={field} />
       </label>
 
       <div className="text-sm">
-        <span className="text-neutral-600">Foto produk</span>
+        <span className="text-muted">Foto produk</span>
         <div className="mt-1 flex items-center gap-3">
-          <div className="h-16 w-16 shrink-0 overflow-hidden rounded-md border border-neutral-200 bg-neutral-100">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-surface-2 text-muted/40">
             {imagePath ? (
               <img src={imagePath} alt="" className="h-full w-full object-cover" />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-neutral-300">🛒</div>
+              <ImageIcon className="h-6 w-6" strokeWidth={1.5} />
             )}
           </div>
           <div className="flex flex-col gap-1">
-            <input type="file" accept="image/*" onChange={onPickImage} className="text-xs" />
+            <input type="file" accept="image/*" onChange={onPickImage} className="text-xs text-muted" />
             {imagePath && (
               <button
                 type="button"
                 onClick={() => setImagePath(null)}
-                className="self-start text-xs text-neutral-500 hover:text-red-600"
+                className="cursor-pointer self-start text-xs text-muted hover:text-danger"
               >
                 Hapus foto
               </button>
@@ -119,19 +122,12 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
       </div>
 
       <div className="flex gap-2 pt-1">
-        <button
-          type="button"
-          onClick={onDone}
-          className="flex-1 rounded-md border border-neutral-300 py-2 font-medium hover:bg-neutral-100"
-        >
+        <Button variant="outline" onClick={onDone} className="flex-1">
           Batal
-        </button>
-        <button
-          type="submit"
-          className="flex-1 rounded-md bg-neutral-900 py-2 font-medium text-white hover:bg-neutral-800"
-        >
+        </Button>
+        <Button type="submit" variant="primary" className="flex-1">
           Simpan
-        </button>
+        </Button>
       </div>
     </form>
   );

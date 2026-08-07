@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { Trash2 } from "lucide-react";
 import { useCatalogStore } from "@/entities/product";
+import { Button } from "@/shared/ui/Button";
 import { deleteCategory, saveCategory } from "../model/manage-category";
 
 /** Inline add/remove list for categories. */
@@ -21,27 +23,25 @@ export function CategoryManager() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Kategori baru"
-          className="flex-1 rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-500"
+          className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-fg outline-none focus:border-primary"
         />
-        <button
-          type="submit"
-          className="rounded-md bg-neutral-900 px-4 text-sm font-medium text-white hover:bg-neutral-800"
-        >
+        <Button type="submit" variant="primary">
           Tambah
-        </button>
+        </Button>
       </form>
       {categories.length === 0 ? (
-        <p className="text-sm text-neutral-400">Belum ada kategori.</p>
+        <p className="text-sm text-muted">Belum ada kategori.</p>
       ) : (
-        <ul className="divide-y divide-neutral-100 rounded-md border border-neutral-200">
+        <ul className="divide-y divide-border rounded-lg border border-border">
           {categories.map((c) => (
-            <li key={c.id} className="flex items-center justify-between px-3 py-2 text-sm">
+            <li key={c.id} className="flex items-center justify-between px-3 py-2 text-sm text-fg">
               <span>{c.name}</span>
               <button
                 type="button"
                 onClick={() => deleteCategory(c.id)}
-                className="text-neutral-400 hover:text-red-600"
+                className="flex cursor-pointer items-center gap-1 text-muted transition-colors hover:text-danger"
               >
+                <Trash2 className="h-3.5 w-3.5" />
                 Hapus
               </button>
             </li>
