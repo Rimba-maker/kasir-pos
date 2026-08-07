@@ -1,1 +1,225 @@
 @import "tailwindcss";
+
+/* Dark variant driven by an explicit [data-theme] on <html> (toggle),
+   falling back to the OS preference when no attribute is set. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ── Design tokens (light) — registers Tailwind color/font utilities ────── */
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+
+  --color-bg: #f5faf9;
+  --color-surface: #ffffff;
+  --color-surface-2: #eef4f3;
+  --color-fg: #10302d;
+  --color-muted: #5a736f;
+  --color-border: #dce7e5;
+
+  --color-primary: #0d9488;
+  --color-primary-hover: #0f766e;
+  --color-on-primary: #ffffff;
+
+  --color-accent: #ea580c;
+  --color-accent-hover: #c2410c;
+  --color-on-accent: #ffffff;
+
+  --color-success: #059669;
+  --color-success-bg: #e7f8f0;
+  --color-success-fg: #047857;
+  --color-warning: #d97706;
+  --color-warning-bg: #fef6e7;
+  --color-warning-fg: #b45309;
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+  --color-danger-bg: #fdecec;
+  --color-danger-fg: #b91c1c;
+
+  --color-ring: #0d9488;
+}
+
+/* Dark overrides — both the OS default (no attribute) and the explicit toggle. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #0b1413;
+    --color-surface: #111d1b;
+    --color-surface-2: #182624;
+    --color-fg: #e6f0ee;
+    --color-muted: #8fa6a2;
+    --color-border: #253431;
+
+    --color-primary: #14b8a6;
+    --color-primary-hover: #2dd4bf;
+    --color-on-primary: #04211e;
+
+    --color-accent: #f97316;
+    --color-accent-hover: #fb923c;
+    --color-on-accent: #2a1405;
+
+    --color-success: #10b981;
+    --color-success-bg: #0c2a22;
+    --color-success-fg: #4ade80;
+    --color-warning: #f59e0b;
+    --color-warning-bg: #2a2110;
+    --color-warning-fg: #fbbf24;
+    --color-danger: #ef4444;
+    --color-danger-hover: #f87171;
+    --color-danger-bg: #2c1618;
+    --color-danger-fg: #f87171;
+
+    --color-ring: #2dd4bf;
+  }
+}
+:root[data-theme="dark"] {
+  --color-bg: #0b1413;
+  --color-surface: #111d1b;
+  --color-surface-2: #182624;
+  --color-fg: #e6f0ee;
+  --color-muted: #8fa6a2;
+  --color-border: #253431;
+
+  --color-primary: #14b8a6;
+  --color-primary-hover: #2dd4bf;
+  --color-on-primary: #04211e;
+
+  --color-accent: #f97316;
+  --color-accent-hover: #fb923c;
+  --color-on-accent: #2a1405;
+
+  --color-success: #10b981;
+  --color-success-bg: #0c2a22;
+  --color-success-fg: #4ade80;
+  --color-warning: #f59e0b;
+  --color-warning-bg: #2a2110;
+  --color-warning-fg: #fbbf24;
+  --color-danger: #ef4444;
+  --color-danger-hover: #f87171;
+  --color-danger-bg: #2c1618;
+  --color-danger-fg: #f87171;
+
+  --color-ring: #2dd4bf;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+    }
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-primary) 25%, transparent);
+  }
+
+  /* Visible keyboard focus everywhere. */
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Slim, theme-aware scrollbars. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  /* Tame number-input spinners. */
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+/* ── Reusable status badge ─────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 9999px;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1rem;
+}
+.badge-success {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-fg);
+}
+.badge-warning {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-fg);
+}
+.badge-danger {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-fg);
+}
+
+/* ── Entrance motion (respects reduced-motion) ─────────────────────────── */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-fade-in {
+  animation: fade-in 0.18s ease-out both;
+}
+.animate-pop-in {
+  animation: pop-in 0.18s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
