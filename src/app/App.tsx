@@ -3,6 +3,8 @@ import { useCatalogStore } from "@/entities/product";
 import { TillPage } from "@/pages/till";
 import { CatalogPage } from "@/pages/catalog";
 import { SalesHistoryPage } from "@/pages/sales-history";
+import { StaffPage } from "@/pages/staff";
+import { SettingsPage } from "@/pages/settings";
 import { categoryApi, productApi, isTauri } from "@/shared/api/pos";
 import { demoCategories, demoProducts } from "./demo-data";
 
@@ -54,15 +56,9 @@ export function App() {
         {route === "till" && <TillPage />}
         {route === "catalog" && <CatalogPage />}
         {route === "sales" && <SalesHistoryPage onResumed={() => setRoute("till")} />}
-        {route === "staff" && <Placeholder label="Manajemen Staff" />}
-        {route === "settings" && <Placeholder label="Pengaturan Toko" />}
+        {route === "staff" && <StaffPage />}
+        {route === "settings" && <SettingsPage />}
       </main>
     </div>
-  );
-}
-
-function Placeholder({ label }: { label: string }) {
-  return (
-    <div className="flex h-full items-center justify-center text-neutral-400">{label} — segera.</div>
   );
 }

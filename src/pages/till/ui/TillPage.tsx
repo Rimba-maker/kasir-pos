@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCatalogStore } from "@/entities/product";
+import { useSettingsStore } from "@/entities/store-settings";
 import { buildTransaction, cartTotals, useCartStore, useSalesStore, type Payment } from "@/entities/transaction";
 import { BarcodeSearch } from "@/features/add-to-cart";
 import { holdSale } from "@/features/hold-resume-sale";
@@ -12,19 +13,30 @@ import { ReceiptPreview } from "@/widgets/receipt-preview";
 import { transactionApi, isTauri } from "@/shared/api/pos";
 import { Modal } from "@/shared/ui/Modal";
 
-// ponytail: hardcoded store identity. Replaced by the settings entity in step 8.
-const STORE: StoreInfo = { name: "Kasir POS", footer: "Terima kasih telah berbelanja" };
-
 type PayStep = null | "choose" | "cash" | "qris";
 
 export function TillPage() {
   const [step, setStep] = useState<PayStep>(null);
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
 
+  const settings = useSettingsStore((s) => s.settings);
+  const store: StoreInfo = {
+    name: settings.name,
+    address: settings.address || undefined,
+    footer: settings.receiptFooter || undefined,
+    printerTarget: settings.printerTarget || undefined,
+  };
+
   const lines = useCartStore((s) => s.lines);
   const discountTotal = useCartStore((s) => s.discountTotal);
   const taxRate = useCartStore((s) => s.taxRate);
+  const setTaxRate = useCartStore((s) => s.setTaxRate);
   const { total } = cartTotals({ lines, discountTotal, taxRate });
+
+  // Keep the cart's tax rate in sync with settings.
+  useEffect(() => {
+    setTaxRate(settings.taxEnabled ? settings.taxRate : 0);
+  }, [settings.taxEnabled, settings.taxRate, setTaxRate]);
 
   async function onPaymentConfirmed(payment: Payment) {
     const cart = useCartStore.getState();
@@ -46,7 +58,7 @@ export function TillPage() {
     useSalesStore.getState().add(tx);
     cart.clear();
     setStep(null);
-    setReceipt(buildReceiptData(tx, STORE));
+    setReceipt(buildReceiptData(tx, store));
   }
 
   async function onHold() {
@@ -56,7 +68,7 @@ export function TillPage() {
   async function onPrint() {
     if (!receipt) return;
     try {
-      await printReceipt(receipt, STORE.printerTarget);
+      await printReceipt(receipt, store.printerTarget);
     } catch (e) {
       alert(String(e instanceof Error ? e.message : e));
     }
@@ -113,7 +125,12 @@ export function TillPage() {
       </Modal>
 
       <Modal open={step === "qris"} title="Pembayaran QRIS" onClose={() => setStep(null)}>
-        <QrisStaticPanel total={total} onConfirm={onPaymentConfirmed} onCancel={() => setStep("choose")} />
+        <QrisStaticPanel
+          total={total}
+          qrImagePath={settings.qrisImagePath || undefined}
+          onConfirm={onPaymentConfirmed}
+          onCancel={() => setStep("choose")}
+        />
       </Modal>
 
       {/* Receipt after a paid sale */}
