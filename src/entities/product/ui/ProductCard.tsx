@@ -17,9 +17,9 @@ export function ProductCard({ product, onSelect }: ProductCardProps) {
       type="button"
       disabled={soldOut}
       onClick={() => onSelect?.(product)}
-      className="group flex cursor-pointer flex-col overflow-hidden rounded-xl border border-border bg-surface text-left transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0 disabled:hover:shadow-none"
+      className="group flex cursor-pointer flex-col rounded-xl border border-border bg-surface text-left transition-all duration-150 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0 disabled:hover:shadow-none"
     >
-      <div className="aspect-square w-full bg-surface-2">
+      <div className="aspect-square w-full overflow-hidden rounded-t-xl bg-surface-2">
         {product.imagePath ? (
           <img
             src={product.imagePath}
