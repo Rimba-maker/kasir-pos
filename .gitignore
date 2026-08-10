@@ -11,11 +11,9 @@ src-tauri/gen/
 # local SQLite data
 *.db
 
-# Internal build/process docs — kept local, not published
-POS-PRD.md
-POS-FSD-structure.md
-CLAUDE.md
-AGENTS.md
-claude-progress.md
-feature_list.json
-docs/agents/
+# Internal build/process docs — kept local, not published.
+# Tool-discovered files must stay in the root, so anchor them with a leading slash;
+# everything else lives in one ignored folder (add new internal docs there, auto-hidden).
+/CLAUDE.md
+/AGENTS.md
+docs/internal/
