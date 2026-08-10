@@ -2,9 +2,6 @@
 
 export const CURRENCY_SYMBOL = "Rp";
 
-/** Rupiah has no sub-unit — all money is stored as whole integers. */
-export const MONEY_DECIMALS = 0;
-
 /** Default PPN rate (11%) used when tax is enabled in settings. */
 export const DEFAULT_TAX_RATE = 0.11;
 

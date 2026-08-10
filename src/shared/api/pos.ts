@@ -5,7 +5,6 @@ import type { Transaction } from "@/entities/transaction";
 /** Typed wrappers over Tauri commands. Only callable inside the Tauri runtime. */
 export const productApi = {
   list: () => invoke<Product[]>("list_products"),
-  get: (id: string) => invoke<Product | null>("get_product", { id }),
   save: (product: Product) => invoke<void>("save_product", { product }),
   remove: (id: string) => invoke<void>("delete_product", { id }),
 };
@@ -19,7 +18,6 @@ export const categoryApi = {
 export const transactionApi = {
   create: (tx: Transaction) => invoke<void>("create_transaction", { tx }),
   list: () => invoke<Transaction[]>("list_transactions"),
-  get: (id: string) => invoke<Transaction | null>("get_transaction", { id }),
   remove: (id: string) => invoke<void>("delete_transaction", { id }),
 };
 

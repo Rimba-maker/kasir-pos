@@ -23,7 +23,6 @@ interface CartState {
   setQty: (productId: string, qty: number) => void;
   changeQty: (productId: string, delta: number) => void;
   removeLine: (productId: string) => void;
-  setLineDiscount: (productId: string, discount: number) => void;
   setDiscountTotal: (amount: number) => void;
   setTaxRate: (rate: number) => void;
   setCustomer: (id: string | null) => void;
@@ -78,13 +77,6 @@ export const useCartStore = create<CartState>((set) => ({
 
   removeLine: (productId) =>
     set((s) => ({ lines: s.lines.filter((l) => l.productId !== productId) })),
-
-  setLineDiscount: (productId, discount) =>
-    set((s) => ({
-      lines: s.lines.map((l) =>
-        l.productId === productId ? { ...l, discount: Math.max(0, discount) } : l,
-      ),
-    })),
 
   setDiscountTotal: (amount) => set({ discountTotal: Math.max(0, amount) }),
   setTaxRate: (rate) => set({ taxRate: Math.max(0, rate) }),
