@@ -25,6 +25,6 @@ pnpm tauri build    # bundle installer
 
 - `src/db/schema.rs` — CREATE TABLE (idempotent, jalan tiap startup)
 - `src/db/models.rs` — struct domain (serialize camelCase → cocok dengan TS entities)
-- `src/db/repositories/` — 1 file per entity (product, transaction)
-- `src/commands/` — 1 file per domain command group (thin, panggil repo)
+- `src/db/repositories/` — 1 file per entity (product, category, transaction)
+- `src/commands/` — 1 file per domain command group (product, category, transaction, printer — thin, panggil repo)
 - DB file: `pos.db` di app data dir OS.
