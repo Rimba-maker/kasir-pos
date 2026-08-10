@@ -16,7 +16,7 @@ export function CategoryFilter({ categories, selected, onSelect }: CategoryFilte
     }`;
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1">
+    <div className="flex shrink-0 gap-2 overflow-x-auto pb-1">
       <button type="button" className={chip(selected === null)} onClick={() => onSelect(null)}>
         Semua
       </button>

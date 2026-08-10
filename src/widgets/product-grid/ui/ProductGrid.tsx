@@ -21,7 +21,7 @@ export function ProductGrid() {
           <p className="text-sm">Belum ada produk.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 overflow-y-auto pr-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
+        <div className="grid min-h-0 flex-1 grid-cols-2 content-start gap-3 overflow-y-auto pr-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5">
           {shown.map((p) => (
             <ProductCard key={p.id} product={p} onSelect={addProductToCart} />
           ))}
