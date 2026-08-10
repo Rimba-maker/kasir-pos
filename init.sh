@@ -1,13 +1,24 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # === Subsistem harness: ENVIRONMENT ===
-# Satu perintah dari fresh clone -> siap kerja. Idempoten (aman dijalankan berkali-kali).
-# Tujuan: agent/manusia tidak perlu menebak cara menyiapkan runtime.
-set -e
+# Satu jalur startup baku: install -> verify -> (opsional) start.
+# Mengikuti pola template kursus (install/verify/start + RUN_START_COMMAND).
+set -euo pipefail
 
-echo "-> install dependencies (pnpm)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$ROOT_DIR"
+
+echo "==> Working directory: $PWD"
+
+echo "==> Sinkron dependencies"
 pnpm install
 
-echo ""
-echo "OK Environment siap."
-echo "   Dev server : pnpm dev        (buka http://localhost:1420)"
-echo "   Verifikasi : sh verify.sh"
+echo "==> Verifikasi baseline"
+sh verify.sh
+
+echo "==> Startup command: pnpm dev   (http://localhost:1420)"
+if [ "${RUN_START_COMMAND:-0}" = "1" ]; then
+  echo "==> Menjalankan app"
+  exec pnpm dev
+fi
+
+echo "Set RUN_START_COMMAND=1 kalau mau init.sh langsung menjalankan app."
