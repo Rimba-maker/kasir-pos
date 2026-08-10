@@ -55,58 +55,89 @@ export function App() {
 
   const visibleNav = NAV.filter((n) => n.perm === null || !currentUser || currentUser.permissions[n.perm]);
 
+  const onLogout = () => {
+    logout();
+    setRoute("till");
+  };
+
   return (
-    <div className="flex h-screen bg-bg text-fg">
-      <nav className="flex w-20 flex-col items-center border-r border-border bg-surface py-3">
-        <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-on-primary">
-          <Store className="h-5 w-5" />
+    <div className="flex h-[100dvh] flex-col bg-bg text-fg">
+      {/* Mobile top app bar — brand + theme + logout (the rail hosts these on desktop) */}
+      <header className="flex shrink-0 items-center justify-between border-b border-border bg-surface px-4 py-2 md:hidden">
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-on-primary">
+            <Store className="h-4 w-4" />
+          </div>
+          <span className="font-bold text-fg">Kasir POS</span>
         </div>
-        <div className="flex flex-1 flex-col items-center gap-1">
-          {visibleNav.map((n) => {
-            const Icon = n.icon;
-            const active = route === n.key;
-            return (
-              <button
-                key={n.key}
-                type="button"
-                onClick={() => setRoute(n.key)}
-                aria-current={active ? "page" : undefined}
-                className={`flex w-16 cursor-pointer flex-col items-center gap-1 rounded-lg py-2 text-[11px] font-medium transition-colors ${
-                  active ? "bg-primary text-on-primary" : "text-muted hover:bg-surface-2 hover:text-fg"
-                }`}
-              >
-                <Icon className="h-5 w-5" strokeWidth={2} />
-                {n.label}
-              </button>
-            );
-          })}
-        </div>
-        <div className="mt-2 flex flex-col items-center gap-1 border-t border-border pt-2">
+        <div className="flex items-center gap-1">
           <ThemeToggle />
           {currentUser && (
             <button
               type="button"
-              onClick={() => {
-                logout();
-                setRoute("till");
-              }}
-              title={`Keluar (${currentUser.name})`}
+              onClick={onLogout}
               aria-label={`Keluar (${currentUser.name})`}
-              className="flex w-16 cursor-pointer flex-col items-center gap-1 rounded-lg py-2 text-[11px] font-medium text-muted transition-colors hover:bg-surface-2 hover:text-danger"
+              className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-2 hover:text-danger"
             >
-              <LogOut className="h-5 w-5" strokeWidth={2} />
-              Keluar
+              <LogOut className="h-5 w-5" />
             </button>
           )}
         </div>
-      </nav>
-      <main className="min-w-0 flex-1">
-        {route === "till" && <TillPage />}
-        {route === "catalog" && <CatalogPage />}
-        {route === "sales" && <SalesHistoryPage onResumed={() => setRoute("till")} />}
-        {route === "staff" && <StaffPage />}
-        {route === "settings" && <SettingsPage />}
-      </main>
+      </header>
+
+      <div className="flex min-h-0 flex-1 flex-col-reverse md:flex-row">
+        {/* Nav: bottom bar (mobile) → left rail (desktop) */}
+        <nav className="flex shrink-0 items-stretch justify-around border-t border-border bg-surface md:w-20 md:flex-col md:justify-start md:border-r md:border-t-0 md:py-3">
+          <div className="mb-3 hidden h-10 w-10 items-center justify-center self-center rounded-xl bg-primary text-on-primary md:flex">
+            <Store className="h-5 w-5" />
+          </div>
+          <div className="flex flex-1 items-stretch justify-around md:flex-col md:items-center md:justify-start md:gap-1">
+            {visibleNav.map((n) => {
+              const Icon = n.icon;
+              const active = route === n.key;
+              return (
+                <button
+                  key={n.key}
+                  type="button"
+                  onClick={() => setRoute(n.key)}
+                  aria-current={active ? "page" : undefined}
+                  className={`flex min-h-[52px] flex-1 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg py-1.5 text-[11px] font-medium transition-colors md:min-h-0 md:w-16 md:flex-none md:py-2 ${
+                    active
+                      ? "text-primary md:bg-primary md:text-on-primary"
+                      : "text-muted hover:bg-surface-2 hover:text-fg"
+                  }`}
+                >
+                  <Icon className="h-5 w-5" strokeWidth={2} />
+                  {n.label}
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-2 hidden flex-col items-center gap-1 border-t border-border pt-2 md:flex">
+            <ThemeToggle />
+            {currentUser && (
+              <button
+                type="button"
+                onClick={onLogout}
+                title={`Keluar (${currentUser.name})`}
+                aria-label={`Keluar (${currentUser.name})`}
+                className="flex w-16 cursor-pointer flex-col items-center gap-1 rounded-lg py-2 text-[11px] font-medium text-muted transition-colors hover:bg-surface-2 hover:text-danger"
+              >
+                <LogOut className="h-5 w-5" strokeWidth={2} />
+                Keluar
+              </button>
+            )}
+          </div>
+        </nav>
+
+        <main className="min-h-0 min-w-0 flex-1 overflow-hidden">
+          {route === "till" && <TillPage />}
+          {route === "catalog" && <CatalogPage />}
+          {route === "sales" && <SalesHistoryPage onResumed={() => setRoute("till")} />}
+          {route === "staff" && <StaffPage />}
+          {route === "settings" && <SettingsPage />}
+        </main>
+      </div>
     </div>
   );
 }
