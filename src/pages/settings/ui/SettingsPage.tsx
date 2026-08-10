@@ -11,7 +11,7 @@ export function SettingsPage() {
     "mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-fg outline-none focus:border-primary";
 
   return (
-    <div className="h-full overflow-auto p-5">
+    <div className="h-full overflow-auto p-4 sm:p-5">
       <h1 className="mb-4 text-xl font-bold text-fg">Pengaturan Toko</h1>
 
       <div className="max-w-lg space-y-5">

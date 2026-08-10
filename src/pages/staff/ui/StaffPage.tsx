@@ -17,8 +17,8 @@ export function StaffPage() {
       .join(", ") || "—";
 
   return (
-    <div className="flex h-full flex-col gap-4 p-5">
-      <div className="flex items-center justify-between">
+    <div className="flex h-full flex-col gap-4 p-4 sm:p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl font-bold text-fg">Manajemen Staff</h1>
           <p className="text-sm text-muted">{staff.length} akun</p>
@@ -37,7 +37,7 @@ export function StaffPage() {
       )}
 
       <div className="min-h-0 flex-1 overflow-auto rounded-xl border border-border bg-surface">
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[480px] text-sm">
           <thead className="sticky top-0 bg-surface-2 text-left text-muted">
             <tr>
               <th className="px-3 py-2.5 font-medium">Nama</th>

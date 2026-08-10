@@ -32,13 +32,13 @@ export function CatalogPage() {
   }
 
   return (
-    <div className="flex h-full flex-col gap-4 p-5">
-      <div className="flex items-center justify-between">
+    <div className="flex h-full flex-col gap-4 p-4 sm:p-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl font-bold text-fg">Katalog Produk</h1>
           <p className="text-sm text-muted">{products.length} produk</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={() => setShowCategories(true)}>
             <Tags className="h-4 w-4" />
             Kategori
@@ -57,7 +57,7 @@ export function CatalogPage() {
       </div>
 
       <div className="min-h-0 flex-1 overflow-auto rounded-xl border border-border bg-surface">
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[560px] text-sm">
           <thead className="sticky top-0 bg-surface-2 text-left text-muted">
             <tr>
               <th className="w-10 px-3 py-2.5"></th>
