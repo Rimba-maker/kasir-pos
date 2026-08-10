@@ -21,17 +21,17 @@ export function Modal({ open, title, onClose, children }: ModalProps) {
 
   return (
     <div
-      className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+      className="animate-fade-in fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label={title}
     >
       <div
-        className="animate-pop-in w-full max-w-md overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl"
+        className="animate-pop-in flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-2xl border border-border bg-surface shadow-2xl sm:max-w-md sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
+        <div className="flex shrink-0 items-center justify-between border-b border-border px-5 py-3.5">
           <h3 className="font-semibold text-fg">{title}</h3>
           <button
             type="button"
@@ -42,7 +42,7 @@ export function Modal({ open, title, onClose, children }: ModalProps) {
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="p-5">{children}</div>
+        <div className="overflow-y-auto p-5">{children}</div>
       </div>
     </div>
   );
