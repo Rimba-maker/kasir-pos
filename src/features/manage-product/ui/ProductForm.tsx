@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ImageIcon } from "lucide-react";
+import { ImageIcon, Loader2, Upload } from "lucide-react";
 import type { Category, Product } from "@/entities/product";
 import { fileToDataUrl } from "@/shared/lib/image";
 import { Button } from "@/shared/ui/Button";
@@ -19,14 +19,19 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
   const [categoryId, setCategoryId] = useState<string | null>(product?.categoryId ?? null);
   const [barcode, setBarcode] = useState(product?.barcode ?? "");
   const [imagePath, setImagePath] = useState<string | null>(product?.imagePath ?? null);
+  const [loadingImage, setLoadingImage] = useState(false);
 
   async function onPickImage(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    setLoadingImage(true);
     try {
       setImagePath(await fileToDataUrl(file));
     } catch (err) {
       alert(`Gagal memuat gambar: ${String(err)}`);
+    } finally {
+      setLoadingImage(false);
+      e.target.value = ""; // izinkan pilih file yang sama lagi
     }
   }
 
@@ -100,19 +105,31 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
         <span className="text-muted">Foto produk</span>
         <div className="mt-1 flex items-center gap-3">
           <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-surface-2 text-muted/40">
-            {imagePath ? (
+            {loadingImage ? (
+              <Loader2 className="h-5 w-5 animate-spin text-muted" />
+            ) : imagePath ? (
               <img src={imagePath} alt="" className="h-full w-full object-cover" />
             ) : (
               <ImageIcon className="h-6 w-6" strokeWidth={1.5} />
             )}
           </div>
-          <div className="flex flex-col gap-1">
-            <input type="file" accept="image/*" onChange={onPickImage} className="text-xs text-muted" />
-            {imagePath && (
+          <div className="flex flex-col items-start gap-1.5">
+            <label className="group inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border bg-surface px-3 py-1.5 text-sm font-medium text-fg transition duration-150 hover:bg-surface-2 active:scale-[0.97] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50">
+              <Upload className="h-4 w-4 text-muted transition-colors group-hover:text-primary" />
+              {imagePath ? "Ganti foto" : "Pilih foto"}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={onPickImage}
+                disabled={loadingImage}
+                className="sr-only"
+              />
+            </label>
+            {imagePath && !loadingImage && (
               <button
                 type="button"
                 onClick={() => setImagePath(null)}
-                className="cursor-pointer self-start text-xs text-muted hover:text-danger"
+                className="cursor-pointer text-xs text-muted transition-colors hover:text-danger"
               >
                 Hapus foto
               </button>
