@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Banknote, PauseCircle, Printer, QrCode } from "lucide-react";
+import { Banknote, PauseCircle, Printer, QrCode, ShoppingCart } from "lucide-react";
+import { formatRupiah } from "@/shared/lib/currency";
 import { useCatalogStore } from "@/entities/product";
 import { useSettingsStore } from "@/entities/store-settings";
 import { buildTransaction, cartTotals, useCartStore, useSalesStore, type Payment } from "@/entities/transaction";
@@ -20,6 +21,7 @@ type PayStep = null | "choose" | "cash" | "qris";
 export function TillPage() {
   const [step, setStep] = useState<PayStep>(null);
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
+  const [cartOpen, setCartOpen] = useState(false); // mobile cart drawer
 
   const settings = useSettingsStore((s) => s.settings);
   const store: StoreInfo = {
@@ -34,6 +36,7 @@ export function TillPage() {
   const taxRate = useCartStore((s) => s.taxRate);
   const setTaxRate = useCartStore((s) => s.setTaxRate);
   const { total } = cartTotals({ lines, discountTotal, taxRate });
+  const itemCount = lines.reduce((n, l) => n + l.qty, 0);
 
   // Keep the cart's tax rate in sync with settings.
   useEffect(() => {
@@ -78,10 +81,10 @@ export function TillPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-bg">
-      <header className="flex items-center justify-between border-b border-border bg-surface px-4 py-3">
-        <div>
-          <h1 className="text-lg font-bold leading-tight text-fg">{settings.name || "Kasir"}</h1>
+    <div className="flex h-full min-h-0 flex-col bg-bg">
+      <header className="flex shrink-0 items-center justify-between border-b border-border bg-surface px-4 py-3">
+        <div className="min-w-0">
+          <h1 className="truncate text-lg font-bold leading-tight text-fg">{settings.name || "Kasir"}</h1>
           <p className="text-xs text-muted">Transaksi kasir</p>
         </div>
         <Button variant="outline" size="sm" onClick={onHold} disabled={lines.length === 0}>
@@ -90,17 +93,57 @@ export function TillPage() {
         </Button>
       </header>
 
-      <div className="grid flex-1 grid-cols-1 gap-4 overflow-hidden p-4 lg:grid-cols-[1fr_384px]">
+      <div className="flex min-h-0 flex-1 flex-col gap-4 p-4 lg:grid lg:grid-cols-[1fr_384px]">
         <div className="flex min-h-0 flex-col gap-3">
           <BarcodeSearch />
           <div className="min-h-0 flex-1">
             <ProductGrid />
           </div>
         </div>
-        <div className="min-h-0">
+        {/* Desktop: cart alongside. Mobile: hidden, reachable via bottom bar. */}
+        <div className="hidden min-h-0 lg:block">
           <CartPanel onCheckout={() => setStep("choose")} />
         </div>
       </div>
+
+      {/* Mobile cart summary bar — sits above the shell's bottom nav */}
+      <button
+        type="button"
+        onClick={() => setCartOpen(true)}
+        disabled={itemCount === 0}
+        className="flex shrink-0 items-center justify-between gap-3 border-t border-border bg-surface px-4 py-3 text-left transition-colors disabled:opacity-60 lg:hidden"
+      >
+        <span className="flex items-center gap-2 font-medium text-fg">
+          <span className="relative">
+            <ShoppingCart className="h-5 w-5 text-primary" />
+            {itemCount > 0 && (
+              <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-on-accent">
+                {itemCount}
+              </span>
+            )}
+          </span>
+          {itemCount === 0 ? "Keranjang kosong" : "Lihat keranjang"}
+        </span>
+        <span className="tabular-nums text-base font-bold text-fg">{formatRupiah(total)}</span>
+      </button>
+
+      {/* Mobile cart drawer */}
+      {cartOpen && (
+        <div className="fixed inset-0 z-40 flex flex-col justify-end lg:hidden">
+          <div
+            className="animate-fade-in absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setCartOpen(false)}
+          />
+          <div className="animate-pop-in relative h-[82dvh]">
+            <CartPanel
+              onCheckout={() => {
+                setCartOpen(false);
+                setStep("choose");
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Choose payment method */}
       <Modal open={step === "choose"} title="Metode Pembayaran" onClose={() => setStep(null)}>
