@@ -5,6 +5,7 @@ import {
   Package,
   Receipt,
   Settings2,
+  ShoppingBag,
   Store,
   Truck,
   Users,
@@ -16,6 +17,7 @@ import { LoginScreen, useSessionStore } from "@/features/auth";
 import { TillPage } from "@/pages/till";
 import { CatalogPage } from "@/pages/catalog";
 import { SuppliersPage } from "@/pages/suppliers";
+import { PurchaseOrdersPage } from "@/pages/purchases";
 import { SalesHistoryPage } from "@/pages/sales-history";
 import { StaffPage } from "@/pages/staff";
 import { SettingsPage } from "@/pages/settings";
@@ -23,13 +25,14 @@ import { categoryApi, productApi, isTauri } from "@/shared/api/pos";
 import { ThemeToggle } from "@/shared/ui/ThemeToggle";
 import { demoCategories, demoProducts } from "./demo-data";
 
-type Route = "till" | "catalog" | "suppliers" | "sales" | "staff" | "settings";
+type Route = "till" | "catalog" | "suppliers" | "purchases" | "sales" | "staff" | "settings";
 
 // perm: null = always allowed (cashier). Otherwise the flag required.
 const NAV: { key: Route; label: string; icon: LucideIcon; perm: keyof StaffPermissions | null }[] = [
   { key: "till", label: "Kasir", icon: Receipt, perm: null },
   { key: "catalog", label: "Katalog", icon: Package, perm: "products" },
   { key: "suppliers", label: "Supplier", icon: Truck, perm: "products" },
+  { key: "purchases", label: "Pembelian", icon: ShoppingBag, perm: "products" },
   { key: "sales", label: "Riwayat", icon: BarChart3, perm: "sales" },
   { key: "staff", label: "Staff", icon: Users, perm: "users" },
   { key: "settings", label: "Pengaturan", icon: Settings2, perm: "settings" },
@@ -137,6 +140,7 @@ export function App() {
           {route === "till" && <TillPage />}
           {route === "catalog" && <CatalogPage />}
           {route === "suppliers" && <SuppliersPage />}
+          {route === "purchases" && <PurchaseOrdersPage />}
           {route === "sales" && <SalesHistoryPage onResumed={() => setRoute("till")} />}
           {route === "staff" && <StaffPage />}
           {route === "settings" && <SettingsPage />}
