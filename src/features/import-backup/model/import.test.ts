@@ -47,8 +47,23 @@ test("rejects input that is not an object", () => {
 });
 
 test("rejects an unsupported version", () => {
-  const result = parseBackup({ ...validSnapshot, version: 2 });
+  const result = parseBackup({ ...validSnapshot, version: 3 });
   expect(result.ok).toBe(false);
+});
+
+test("upgrades a legacy v1 product to the tier-price shape", () => {
+  const v1 = {
+    ...validSnapshot,
+    version: 1,
+    products: [{ id: "old", name: "Kopi", price: 9_000, categoryId: null, stock: 3, barcode: null, imagePath: null }],
+  } as unknown;
+  const result = parseBackup(v1);
+  expect(result.ok).toBe(true);
+  if (result.ok) {
+    expect(result.data.version).toBe(2);
+    expect(result.data.products[0].prices.umum).toBe(9_000);
+    expect(result.data.products[0].baseUnit).toBe("pcs");
+  }
 });
 
 test("rejects when a required collection is missing or not an array", () => {
