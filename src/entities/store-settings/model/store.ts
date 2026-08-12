@@ -11,6 +11,7 @@ const defaults: StoreSettings = {
   taxEnabled: false,
   taxRate: DEFAULT_TAX_RATE,
   taxInclusive: false,
+  shiftEnabled: false,
   receiptFooter: "Terima kasih telah berbelanja",
   printerTarget: "",
   qrisImagePath: "",

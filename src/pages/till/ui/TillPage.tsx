@@ -4,6 +4,7 @@ import { formatRupiah } from "@/shared/lib/currency";
 import { useCatalogStore } from "@/entities/product";
 import { recordStockMovement } from "@/entities/stock-ledger";
 import { consumeBatchesFefo } from "@/entities/batch";
+import { currentShift, useShiftStore } from "@/entities/shift";
 import { useSettingsStore } from "@/entities/store-settings";
 import { buildTransaction, cartTotals, useCartStore, useSalesStore, type Payment } from "@/entities/transaction";
 import { BarcodeSearch } from "@/features/add-to-cart";
@@ -58,6 +59,7 @@ export function TillPage() {
       status: "paid",
       payment,
       customerId: cart.customerId,
+      shiftId: currentShift(useShiftStore.getState().shifts)?.id ?? null,
     });
     try {
       if (isTauri()) await transactionApi.create(tx);

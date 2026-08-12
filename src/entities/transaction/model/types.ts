@@ -26,6 +26,8 @@ export interface Transaction {
   createdAt: string;
   cashierId: string | null;
   customerId: string | null;
+  /** Cashier shift this sale belongs to, if shifts are in use. */
+  shiftId?: string | null;
   status: TransactionStatus;
   items: TransactionItem[];
   /** Transaction-level discount in Rupiah (>= 0). */

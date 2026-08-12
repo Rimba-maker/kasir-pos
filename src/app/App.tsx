@@ -3,6 +3,7 @@ import {
   BarChart3,
   CalendarClock,
   ClipboardCheck,
+  Clock,
   LogOut,
   Package,
   PackageSearch,
@@ -15,6 +16,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useCatalogStore } from "@/entities/product";
+import { useSettingsStore } from "@/entities/store-settings";
 import { useStaffStore, type StaffPermissions } from "@/entities/staff";
 import { LoginScreen, useSessionStore } from "@/features/auth";
 import { TillPage } from "@/pages/till";
@@ -24,6 +26,7 @@ import { PurchaseOrdersPage } from "@/pages/purchases";
 import { OpnamePage } from "@/pages/opname";
 import { BatchesPage } from "@/pages/batches";
 import { ReorderPage } from "@/pages/reorder";
+import { ShiftPage } from "@/pages/shift";
 import { SalesHistoryPage } from "@/pages/sales-history";
 import { StaffPage } from "@/pages/staff";
 import { SettingsPage } from "@/pages/settings";
@@ -31,11 +34,13 @@ import { categoryApi, productApi, isTauri } from "@/shared/api/pos";
 import { ThemeToggle } from "@/shared/ui/ThemeToggle";
 import { demoCategories, demoProducts } from "./demo-data";
 
-type Route = "till" | "catalog" | "suppliers" | "purchases" | "opname" | "batches" | "reorder" | "sales" | "staff" | "settings";
+type Route = "till" | "catalog" | "suppliers" | "purchases" | "opname" | "batches" | "reorder" | "shift" | "sales" | "staff" | "settings";
 
 // perm: null = always allowed (cashier). Otherwise the flag required.
-const NAV: { key: Route; label: string; icon: LucideIcon; perm: keyof StaffPermissions | null }[] = [
+// flag: optional settings toggle that must be on for the item to show.
+const NAV: { key: Route; label: string; icon: LucideIcon; perm: keyof StaffPermissions | null; flag?: "shiftEnabled" }[] = [
   { key: "till", label: "Kasir", icon: Receipt, perm: null },
+  { key: "shift", label: "Shift", icon: Clock, perm: null, flag: "shiftEnabled" },
   { key: "catalog", label: "Katalog", icon: Package, perm: "products" },
   { key: "suppliers", label: "Supplier", icon: Truck, perm: "products" },
   { key: "purchases", label: "Pembelian", icon: ShoppingBag, perm: "products" },
@@ -52,6 +57,7 @@ export function App() {
   const setProducts = useCatalogStore((s) => s.setProducts);
   const setCategories = useCatalogStore((s) => s.setCategories);
   const staff = useStaffStore((s) => s.staff);
+  const settings = useSettingsStore((s) => s.settings);
   const currentUser = useSessionStore((s) => s.currentUser);
   const logout = useSessionStore((s) => s.logout);
 
@@ -68,7 +74,11 @@ export function App() {
   // Gate: once staff accounts exist, require login. Fresh install = open access.
   if (staff.length > 0 && !currentUser) return <LoginScreen />;
 
-  const visibleNav = NAV.filter((n) => n.perm === null || !currentUser || currentUser.permissions[n.perm]);
+  const visibleNav = NAV.filter(
+    (n) =>
+      (n.perm === null || !currentUser || currentUser.permissions[n.perm]) &&
+      (!n.flag || settings[n.flag]),
+  );
 
   const onLogout = () => {
     logout();
@@ -153,6 +163,7 @@ export function App() {
           {route === "opname" && <OpnamePage />}
           {route === "batches" && <BatchesPage />}
           {route === "reorder" && <ReorderPage />}
+          {route === "shift" && <ShiftPage />}
           {route === "sales" && <SalesHistoryPage onResumed={() => setRoute("till")} />}
           {route === "staff" && <StaffPage />}
           {route === "settings" && <SettingsPage />}

@@ -23,6 +23,7 @@ const validSnapshot: BackupData = {
     taxEnabled: false,
     taxRate: 0,
     taxInclusive: false,
+    shiftEnabled: false,
     receiptFooter: "",
     printerTarget: "",
     qrisImagePath: "",

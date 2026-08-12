@@ -11,6 +11,7 @@ export interface BuildTransactionInput {
   payment: Payment | null;
   cashierId?: string | null;
   customerId?: string | null;
+  shiftId?: string | null;
   /** Overridable for deterministic tests. */
   id?: string;
   createdAt?: string;
@@ -25,6 +26,7 @@ export function buildTransaction(input: BuildTransactionInput): Transaction {
     createdAt: input.createdAt ?? new Date().toISOString(),
     cashierId: input.cashierId ?? null,
     customerId: input.customerId ?? null,
+    shiftId: input.shiftId ?? null,
     status: input.status,
     items: lines.map((l) => ({
       productId: l.productId,

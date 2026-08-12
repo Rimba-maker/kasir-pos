@@ -92,6 +92,18 @@ export function SettingsPage() {
           )}
         </Section>
 
+        <Section title="Operasional">
+          <label className="flex items-center gap-2 text-sm text-fg">
+            <input
+              type="checkbox"
+              checked={settings.shiftEnabled}
+              onChange={(e) => update({ shiftEnabled: e.target.checked })}
+              className="accent-[var(--color-primary)]"
+            />
+            Aktifkan shift kasir (buka/tutup + rekonsiliasi kas)
+          </label>
+        </Section>
+
         <Section title="Perangkat">
           <Text
             label="Target printer (device / share path)"
