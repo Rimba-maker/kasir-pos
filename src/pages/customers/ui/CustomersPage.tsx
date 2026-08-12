@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Pencil, Plus, Trash2, Users, Wallet } from "lucide-react";
 import { DEFAULT_PRICE_TIERS } from "@/entities/product";
 import { customerBalance, useCustomerStore, type Customer } from "@/entities/customer";
+import { customerPoints, lifetimePoints, tierFor, useLoyaltyStore } from "@/entities/loyalty";
 import { useSalesStore } from "@/entities/transaction";
 import { formatRupiah } from "@/shared/lib/currency";
 import { Button } from "@/shared/ui/Button";
@@ -14,10 +15,14 @@ export function CustomersPage() {
   const remove = useCustomerStore((s) => s.remove);
   const addPayment = useCustomerStore((s) => s.addPayment);
   const transactions = useSalesStore((s) => s.transactions);
+  const pointEntries = useLoyaltyStore((s) => s.pointEntries);
+  const tiers = useLoyaltyStore((s) => s.tiers);
   const [editing, setEditing] = useState<Customer | null | undefined>(undefined);
   const [paying, setPaying] = useState<Customer | null>(null);
 
   const balanceOf = (id: string) => customerBalance(transactions, payments, id);
+  const pointsOf = (id: string) => customerPoints(pointEntries, id);
+  const tierOf = (id: string) => tierFor(lifetimePoints(pointEntries, id), tiers)?.name ?? "—";
   const tierName = (id?: string | null) => DEFAULT_PRICE_TIERS.find((t) => t.id === id)?.name ?? "Umum";
 
   return (
@@ -43,6 +48,7 @@ export function CustomersPage() {
                 <th className="px-3 py-2.5 font-medium">Nama</th>
                 <th className="px-3 py-2.5 font-medium">Telepon</th>
                 <th className="px-3 py-2.5 font-medium">Tier</th>
+                <th className="px-3 py-2.5 text-right font-medium">Poin</th>
                 <th className="px-3 py-2.5 text-right font-medium">Piutang</th>
                 <th className="px-3 py-2.5"></th>
               </tr>
@@ -52,7 +58,8 @@ export function CustomersPage() {
                 <tr key={c.id} className="border-t border-border">
                   <td className="px-3 py-2.5 font-medium text-fg">{c.name}</td>
                   <td className="px-3 py-2.5 text-muted">{c.phone || "—"}</td>
-                  <td className="px-3 py-2.5 text-muted">{tierName(c.priceTierId)}</td>
+                  <td className="px-3 py-2.5 text-muted">{tierName(c.priceTierId)} · {tierOf(c.id)}</td>
+                  <td className="px-3 py-2.5 text-right tabular-nums text-muted">{pointsOf(c.id)}</td>
                   <td className="px-3 py-2.5 text-right tabular-nums text-fg">{formatRupiah(balanceOf(c.id))}</td>
                   <td className="px-3 py-2.5">
                     <div className="flex justify-end gap-1">

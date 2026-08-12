@@ -6,6 +6,7 @@ import { recordStockMovement } from "@/entities/stock-ledger";
 import { consumeBatchesFefo } from "@/entities/batch";
 import { currentShift, useShiftStore } from "@/entities/shift";
 import { applicablePromo, usePromoStore } from "@/entities/promo";
+import { pointsForSale, useLoyaltyStore } from "@/entities/loyalty";
 import { useSettingsStore } from "@/entities/store-settings";
 import { buildTransaction, cartTotals, useCartStore, useSalesStore, type Payment, type Transaction } from "@/entities/transaction";
 import { BarcodeSearch } from "@/features/add-to-cart";
@@ -87,6 +88,12 @@ export function TillPage() {
       if (prod?.trackBatch) consumeBatchesFefo(i.productId, i.qty);
     });
     useSalesStore.getState().add(tx);
+    if (tx.customerId && tx.paymentStatus === "paid") {
+      const { config, addPointEntry } = useLoyaltyStore.getState();
+      const pts = pointsForSale(tx.total, config);
+      if (pts > 0)
+        addPointEntry({ id: crypto.randomUUID(), customerId: tx.customerId, txId: tx.id, delta: pts, at: new Date().toISOString(), reason: "earn" });
+    }
     useCartStore.getState().clear();
     setStep(null);
     setReceipt(buildReceiptData(tx, store));

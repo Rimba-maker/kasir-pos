@@ -12,6 +12,7 @@ import {
   ShoppingBag,
   Store,
   Tag,
+  Ticket,
   Truck,
   Users,
   type LucideIcon,
@@ -30,6 +31,7 @@ import { ReorderPage } from "@/pages/reorder";
 import { ShiftPage } from "@/pages/shift";
 import { CustomersPage } from "@/pages/customers";
 import { PromosPage } from "@/pages/promos";
+import { LoyaltyPage } from "@/pages/loyalty";
 import { SalesHistoryPage } from "@/pages/sales-history";
 import { StaffPage } from "@/pages/staff";
 import { SettingsPage } from "@/pages/settings";
@@ -37,7 +39,7 @@ import { categoryApi, productApi, isTauri } from "@/shared/api/pos";
 import { ThemeToggle } from "@/shared/ui/ThemeToggle";
 import { demoCategories, demoProducts } from "./demo-data";
 
-type Route = "till" | "catalog" | "suppliers" | "purchases" | "opname" | "batches" | "reorder" | "shift" | "customers" | "promos" | "sales" | "staff" | "settings";
+type Route = "till" | "catalog" | "suppliers" | "purchases" | "opname" | "batches" | "reorder" | "shift" | "customers" | "promos" | "loyalty" | "sales" | "staff" | "settings";
 
 // perm: null = always allowed (cashier). Otherwise the flag required.
 // flag: optional settings toggle that must be on for the item to show.
@@ -52,6 +54,7 @@ const NAV: { key: Route; label: string; icon: LucideIcon; perm: keyof StaffPermi
   { key: "reorder", label: "Menipis", icon: PackageSearch, perm: "products" },
   { key: "customers", label: "Pelanggan", icon: Users, perm: "sales" },
   { key: "promos", label: "Promo", icon: Tag, perm: "products" },
+  { key: "loyalty", label: "Loyalty", icon: Ticket, perm: "products" },
   { key: "sales", label: "Riwayat", icon: BarChart3, perm: "sales" },
   { key: "staff", label: "Staff", icon: Users, perm: "users" },
   { key: "settings", label: "Pengaturan", icon: Settings2, perm: "settings" },
@@ -171,6 +174,7 @@ export function App() {
           {route === "shift" && <ShiftPage />}
           {route === "customers" && <CustomersPage />}
           {route === "promos" && <PromosPage />}
+          {route === "loyalty" && <LoyaltyPage />}
           {route === "sales" && <SalesHistoryPage onResumed={() => setRoute("till")} />}
           {route === "staff" && <StaffPage />}
           {route === "settings" && <SettingsPage />}
