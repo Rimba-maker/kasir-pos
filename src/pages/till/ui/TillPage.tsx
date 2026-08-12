@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Banknote, PauseCircle, Printer, QrCode, ShoppingCart } from "lucide-react";
 import { formatRupiah } from "@/shared/lib/currency";
-import { useCatalogStore } from "@/entities/product";
+import { recordStockMovement } from "@/entities/stock-ledger";
 import { useSettingsStore } from "@/entities/store-settings";
 import { buildTransaction, cartTotals, useCartStore, useSalesStore, type Payment } from "@/entities/transaction";
 import { BarcodeSearch } from "@/features/add-to-cart";
@@ -59,8 +59,9 @@ export function TillPage() {
       alert(`Gagal menyimpan transaksi: ${String(e)}`);
       return;
     }
-    const dec = useCatalogStore.getState().decrementStock;
-    tx.items.forEach((i) => dec(i.productId, i.qty));
+    tx.items.forEach((i) =>
+      recordStockMovement({ productId: i.productId, type: "sale", qty: -i.qty, refType: "transaction", refId: tx.id }),
+    );
     useSalesStore.getState().add(tx);
     cart.clear();
     setStep(null);

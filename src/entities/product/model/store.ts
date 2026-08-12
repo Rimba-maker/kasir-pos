@@ -11,8 +11,6 @@ interface CatalogState {
   removeProducts: (ids: string[]) => void;
   upsertCategory: (category: Category) => void;
   removeCategory: (id: string) => void;
-  /** Local stock decrement after a confirmed sale. Backend remains source of truth. */
-  decrementStock: (id: string, qty: number) => void;
 }
 
 export const useCatalogStore = create<CatalogState>((set) => ({
@@ -47,11 +45,5 @@ export const useCatalogStore = create<CatalogState>((set) => ({
       categories: s.categories.filter((c) => c.id !== id),
       // orphaned products fall back to "uncategorized"
       products: s.products.map((p) => (p.categoryId === id ? { ...p, categoryId: null } : p)),
-    })),
-  decrementStock: (id, qty) =>
-    set((s) => ({
-      products: s.products.map((p) =>
-        p.id === id ? { ...p, stock: Math.max(0, p.stock - qty) } : p,
-      ),
     })),
 }));
