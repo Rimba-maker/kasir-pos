@@ -12,6 +12,8 @@ export interface TransactionItem {
   qty: number;
   /** Per-line discount amount in Rupiah (>= 0). */
   discount: number;
+  /** Cost price snapshot at sale time, for profit reporting. */
+  cost?: number | null;
 }
 
 export interface Payment {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   BarChart3,
+  LayoutDashboard,
   CalendarClock,
   ClipboardCheck,
   Clock,
@@ -32,6 +33,7 @@ import { ShiftPage } from "@/pages/shift";
 import { CustomersPage } from "@/pages/customers";
 import { PromosPage } from "@/pages/promos";
 import { LoyaltyPage } from "@/pages/loyalty";
+import { DashboardPage } from "@/pages/dashboard";
 import { SalesHistoryPage } from "@/pages/sales-history";
 import { StaffPage } from "@/pages/staff";
 import { SettingsPage } from "@/pages/settings";
@@ -39,12 +41,13 @@ import { categoryApi, productApi, isTauri } from "@/shared/api/pos";
 import { ThemeToggle } from "@/shared/ui/ThemeToggle";
 import { demoCategories, demoProducts } from "./demo-data";
 
-type Route = "till" | "catalog" | "suppliers" | "purchases" | "opname" | "batches" | "reorder" | "shift" | "customers" | "promos" | "loyalty" | "sales" | "staff" | "settings";
+type Route = "till" | "dashboard" | "catalog" | "suppliers" | "purchases" | "opname" | "batches" | "reorder" | "shift" | "customers" | "promos" | "loyalty" | "sales" | "staff" | "settings";
 
 // perm: null = always allowed (cashier). Otherwise the flag required.
 // flag: optional settings toggle that must be on for the item to show.
 const NAV: { key: Route; label: string; icon: LucideIcon; perm: keyof StaffPermissions | null; flag?: "shiftEnabled" }[] = [
   { key: "till", label: "Kasir", icon: Receipt, perm: null },
+  { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, perm: "sales" },
   { key: "shift", label: "Shift", icon: Clock, perm: null, flag: "shiftEnabled" },
   { key: "catalog", label: "Katalog", icon: Package, perm: "products" },
   { key: "suppliers", label: "Supplier", icon: Truck, perm: "products" },
@@ -165,6 +168,7 @@ export function App() {
 
         <main className="min-h-0 min-w-0 flex-1 overflow-hidden">
           {route === "till" && <TillPage />}
+          {route === "dashboard" && <DashboardPage />}
           {route === "catalog" && <CatalogPage />}
           {route === "suppliers" && <SuppliersPage />}
           {route === "purchases" && <PurchaseOrdersPage />}

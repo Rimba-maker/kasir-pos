@@ -39,6 +39,7 @@ export function buildTransaction(input: BuildTransactionInput): Transaction {
       unitPrice: l.unitPrice,
       qty: l.qty,
       discount: l.discount,
+      cost: l.cost ?? null,
     })),
     discountTotal,
     taxRate,

@@ -8,6 +8,8 @@ export interface CartLine {
   qty: number;
   /** Per-line discount amount in Rupiah. */
   discount: number;
+  /** Cost price snapshot at add time, for profit reporting. */
+  cost?: number | null;
 }
 
 interface CartState {
@@ -21,7 +23,7 @@ interface CartState {
   /** Optional customer attached to this sale. */
   customerId: string | null;
 
-  addItem: (p: { id: string; name: string; price: number }, qty?: number) => void;
+  addItem: (p: { id: string; name: string; price: number; cost?: number | null }, qty?: number) => void;
   setQty: (productId: string, qty: number) => void;
   changeQty: (productId: string, delta: number) => void;
   removeLine: (productId: string) => void;
@@ -58,7 +60,7 @@ export const useCartStore = create<CartState>((set) => ({
       return {
         lines: [
           ...s.lines,
-          { productId: p.id, name: p.name, unitPrice: p.price, qty, discount: 0 },
+          { productId: p.id, name: p.name, unitPrice: p.price, qty, discount: 0, cost: p.cost ?? null },
         ],
       };
     }),
