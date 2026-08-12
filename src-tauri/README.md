@@ -28,3 +28,12 @@ pnpm tauri build    # bundle installer
 - `src/db/repositories/` — 1 file per entity (product, category, transaction)
 - `src/commands/` — 1 file per domain command group (product, category, transaction, printer — thin, panggil repo)
 - DB file: `pos.db` di app data dir OS.
+
+## Cakupan saat ini
+
+Backend Rust ini baru mencakup **product / category / transaction**. Modul baru
+(supplier, purchase order, stock ledger, opname, batch, shift, promo, loyalty, piutang,
+audit) berjalan di frontend via **zustand + localStorage** dan **belum** punya repository
+SQLite di sini — perluasan menyusul saat `desktop-001` dibuka (Rust + MSVC terpasang).
+Pola penambahan: 1 file repo baru di `db/repositories/` + 1 group command, tanpa mengubah
+yang lama (Open/Closed).
