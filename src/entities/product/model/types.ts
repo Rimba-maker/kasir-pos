@@ -35,6 +35,12 @@ export interface Product {
   isKit?: boolean;
   /** Component products consumed when a kit is sold. */
   components?: KitComponent[];
+  /** Low-stock threshold (base units); stock ≤ this flags a reorder. */
+  reorderPoint?: number | null;
+  /** Suggested reorder quantity (base units). */
+  reorderQty?: number | null;
+  /** Preferred supplier, used to group auto-PO suggestions. */
+  defaultSupplierId?: string | null;
   categoryId: string | null;
   /** Units on hand, in base unit. Decrements on sale. */
   stock: number;

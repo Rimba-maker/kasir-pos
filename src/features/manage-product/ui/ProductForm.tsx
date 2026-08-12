@@ -8,6 +8,7 @@ import {
   type Product,
   type ProductUnit,
 } from "@/entities/product";
+import { useSupplierStore } from "@/entities/supplier";
 import { fileToDataUrl } from "@/shared/lib/image";
 import { Button } from "@/shared/ui/Button";
 import { saveProduct } from "../model/manage-product";
@@ -29,7 +30,11 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
   const [trackBatch, setTrackBatch] = useState(product?.trackBatch ?? false);
   const [isKit, setIsKit] = useState(product?.isKit ?? false);
   const [components, setComponents] = useState<KitComponent[]>(product?.components ?? []);
+  const [reorderPoint, setReorderPoint] = useState(product?.reorderPoint ?? 0);
+  const [reorderQty, setReorderQty] = useState(product?.reorderQty ?? 0);
+  const [defaultSupplierId, setDefaultSupplierId] = useState(product?.defaultSupplierId ?? "");
   const allProducts = useCatalogStore((s) => s.products);
+  const suppliers = useSupplierStore((s) => s.suppliers);
   const componentChoices = allProducts.filter((p) => p.id !== product?.id && !p.isKit);
   const [categoryId, setCategoryId] = useState<string | null>(product?.categoryId ?? null);
   const [barcode, setBarcode] = useState(product?.barcode ?? "");
@@ -68,6 +73,9 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
       components: isKit
         ? components.filter((c) => c.productId && c.qty > 0).map((c) => ({ productId: c.productId, qty: Math.round(c.qty) }))
         : undefined,
+      reorderPoint: reorderPoint > 0 ? Math.round(reorderPoint) : null,
+      reorderQty: reorderQty > 0 ? Math.round(reorderQty) : null,
+      defaultSupplierId: defaultSupplierId || null,
       stock: Math.max(0, Math.round(stock)),
       categoryId,
       barcode: barcode.trim() || null,
@@ -146,6 +154,44 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
       <label className="block text-sm">
         <span className="text-muted">Barcode (opsional)</span>
         <input value={barcode} onChange={(e) => setBarcode(e.target.value)} className={field} />
+      </label>
+
+      <div className="grid grid-cols-2 gap-3">
+        <label className="block text-sm">
+          <span className="text-muted">Stok minimum</span>
+          <input
+            type="number"
+            min={0}
+            value={reorderPoint || ""}
+            onChange={(e) => setReorderPoint(Number(e.target.value) || 0)}
+            placeholder="—"
+            className={field}
+          />
+        </label>
+        <label className="block text-sm">
+          <span className="text-muted">Qty pesan ulang</span>
+          <input
+            type="number"
+            min={0}
+            value={reorderQty || ""}
+            onChange={(e) => setReorderQty(Number(e.target.value) || 0)}
+            placeholder="—"
+            className={field}
+          />
+        </label>
+      </div>
+      <label className="block text-sm">
+        <span className="text-muted">Supplier utama (opsional)</span>
+        <select
+          value={defaultSupplierId}
+          onChange={(e) => setDefaultSupplierId(e.target.value)}
+          className={field}
+        >
+          <option value="">Tanpa supplier</option>
+          {suppliers.map((s) => (
+            <option key={s.id} value={s.id}>{s.name}</option>
+          ))}
+        </select>
       </label>
 
       <div className="grid grid-cols-2 gap-3">

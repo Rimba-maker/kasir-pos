@@ -26,6 +26,7 @@ const STATUS_STYLE: Record<string, string> = {
 export function PurchaseOrdersPage() {
   const orders = usePurchaseStore((s) => s.orders);
   const receipts = usePurchaseStore((s) => s.receipts);
+  const upsertOrder = usePurchaseStore((s) => s.upsertOrder);
   const suppliers = useSupplierStore((s) => s.suppliers);
   const [creating, setCreating] = useState(false);
   const [receiving, setReceiving] = useState<PurchaseOrder | null>(null);
@@ -78,6 +79,11 @@ export function PurchaseOrdersPage() {
                     <td className="px-3 py-2.5 text-right tabular-nums text-fg">{formatRupiah(poTotal(po))}</td>
                     <td className="px-3 py-2.5 text-right">
                       <div className="flex justify-end gap-1.5">
+                        {status === "draft" && (
+                          <Button variant="primary" size="sm" onClick={() => upsertOrder({ ...po, status: "ordered" })}>
+                            Pesan
+                          </Button>
+                        )}
                         {status !== "completed" && status !== "draft" && (
                           <Button variant="outline" size="sm" onClick={() => setReceiving(po)}>
                             Terima
