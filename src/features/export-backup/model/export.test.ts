@@ -10,7 +10,7 @@ beforeEach(() => {
 
 test("backup includes all local data with a version stamp", async () => {
   useCatalogStore.getState().setProducts([
-    { id: "p1", name: "Kopi", costPrice: null, prices: { umum: 10_000 }, categoryId: null, stock: 5, barcode: null, imagePath: null },
+    { id: "p1", name: "Kopi", costPrice: null, prices: { umum: 10_000 }, baseUnit: "pcs", units: [], categoryId: null, stock: 5, barcode: null, imagePath: null },
   ]);
   useCatalogStore.getState().setCategories([{ id: "c1", name: "Minuman" }]);
   useCustomerStore.getState().upsert({ id: "cu1", name: "Budi", phone: "0812" });

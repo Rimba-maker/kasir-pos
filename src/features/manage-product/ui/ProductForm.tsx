@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { ImageIcon, Loader2, Upload } from "lucide-react";
-import { sellPrice, type Category, type Product } from "@/entities/product";
+import { ImageIcon, Loader2, Trash2, Upload } from "lucide-react";
+import { sellPrice, type Category, type Product, type ProductUnit } from "@/entities/product";
 import { fileToDataUrl } from "@/shared/lib/image";
 import { Button } from "@/shared/ui/Button";
 import { saveProduct } from "../model/manage-product";
@@ -17,6 +17,8 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
   const [price, setPrice] = useState(product ? sellPrice(product) : 0);
   const [costPrice, setCostPrice] = useState(product?.costPrice ?? 0);
   const [stock, setStock] = useState(product?.stock ?? 0);
+  const [baseUnit, setBaseUnit] = useState(product?.baseUnit ?? "pcs");
+  const [units, setUnits] = useState<ProductUnit[]>(product?.units ?? []);
   const [categoryId, setCategoryId] = useState<string | null>(product?.categoryId ?? null);
   const [barcode, setBarcode] = useState(product?.barcode ?? "");
   const [imagePath, setImagePath] = useState<string | null>(product?.imagePath ?? null);
@@ -45,6 +47,10 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
       name: name.trim(),
       costPrice: cost > 0 ? cost : null,
       prices: { ...(product?.prices ?? {}), umum: Math.max(0, Math.round(price)) },
+      baseUnit: baseUnit.trim() || "pcs",
+      units: units
+        .filter((u) => u.name.trim() && u.factor > 0)
+        .map((u) => ({ name: u.name.trim(), factor: Math.round(u.factor), barcode: u.barcode?.trim() || null })),
       stock: Math.max(0, Math.round(stock)),
       categoryId,
       barcode: barcode.trim() || null,
@@ -52,6 +58,11 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
     });
     onDone();
   }
+
+  const updateUnit = (i: number, patch: Partial<ProductUnit>) =>
+    setUnits((us) => us.map((u, j) => (j === i ? { ...u, ...patch } : u)));
+  const addUnit = () => setUnits((us) => [...us, { name: "", factor: 1 }]);
+  const removeUnit = (i: number) => setUnits((us) => us.filter((_, j) => j !== i));
 
   const field =
     "mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-fg outline-none focus:border-primary";
@@ -113,6 +124,63 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
         <span className="text-muted">Barcode (opsional)</span>
         <input value={barcode} onChange={(e) => setBarcode(e.target.value)} className={field} />
       </label>
+
+      <div className="grid grid-cols-2 gap-3">
+        <label className="block text-sm">
+          <span className="text-muted">Satuan dasar</span>
+          <input
+            value={baseUnit}
+            onChange={(e) => setBaseUnit(e.target.value)}
+            placeholder="pcs"
+            className={field}
+          />
+        </label>
+      </div>
+
+      <div className="text-sm">
+        <div className="flex items-center justify-between">
+          <span className="text-muted">Satuan tambahan (opsional)</span>
+          <button
+            type="button"
+            onClick={addUnit}
+            className="cursor-pointer text-xs font-medium text-primary hover:underline"
+          >
+            + Tambah satuan
+          </button>
+        </div>
+        {units.length > 0 && (
+          <div className="mt-1.5 space-y-2">
+            {units.map((u, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input
+                  value={u.name}
+                  onChange={(e) => updateUnit(i, { name: e.target.value })}
+                  placeholder="box"
+                  className={`${field} mt-0 flex-1`}
+                />
+                <span className="shrink-0 text-xs text-muted">=</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={u.factor || ""}
+                  onChange={(e) => updateUnit(i, { factor: Number(e.target.value) || 1 })}
+                  placeholder="12"
+                  className={`${field} mt-0 w-20`}
+                />
+                <span className="shrink-0 text-xs text-muted">{baseUnit || "pcs"}</span>
+                <button
+                  type="button"
+                  onClick={() => removeUnit(i)}
+                  aria-label="Hapus satuan"
+                  className="shrink-0 cursor-pointer text-muted transition-colors hover:text-danger"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="text-sm">
         <span className="text-muted">Foto produk</span>

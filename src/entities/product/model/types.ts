@@ -3,6 +3,15 @@ export interface Category {
   name: string;
 }
 
+export interface ProductUnit {
+  name: string;
+  /** How many base units this equals (base unit is implicit, factor 1). */
+  factor: number;
+  barcode?: string | null;
+  /** Optional per-tier price override; falls back to factor × base price. */
+  prices?: Record<string, number>;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -10,8 +19,12 @@ export interface Product {
   costPrice: number | null;
   /** Sell price per tier id, integer Rupiah. Must contain the "umum" tier. */
   prices: Record<string, number>;
+  /** Base stock unit (smallest integer unit, e.g. "pcs", "gram"). */
+  baseUnit: string;
+  /** Larger sell/buy units (box, karton, kg) converted via factor. */
+  units: ProductUnit[];
   categoryId: string | null;
-  /** Units on hand. Decrements on sale. */
+  /** Units on hand, in base unit. Decrements on sale. */
   stock: number;
   barcode: string | null;
   /** Local file path; null renders a placeholder tile. */
