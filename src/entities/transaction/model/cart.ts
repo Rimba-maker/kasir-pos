@@ -16,6 +16,8 @@ interface CartState {
   discountTotal: number;
   /** Tax rate 0..1; 0 when tax disabled. */
   taxRate: number;
+  /** When true, line prices already include tax. */
+  taxInclusive: boolean;
   /** Optional customer attached to this sale. */
   customerId: string | null;
 
@@ -25,12 +27,14 @@ interface CartState {
   removeLine: (productId: string) => void;
   setDiscountTotal: (amount: number) => void;
   setTaxRate: (rate: number) => void;
+  setTaxInclusive: (inclusive: boolean) => void;
   setCustomer: (id: string | null) => void;
   /** Replace the whole cart (used when resuming a held sale). */
   loadDraft: (draft: {
     lines: CartLine[];
     discountTotal: number;
     taxRate: number;
+    taxInclusive?: boolean;
     customerId: string | null;
   }) => void;
   clear: () => void;
@@ -40,6 +44,7 @@ export const useCartStore = create<CartState>((set) => ({
   lines: [],
   discountTotal: 0,
   taxRate: 0,
+  taxInclusive: false,
   customerId: null,
 
   addItem: (p, qty = 1) =>
@@ -80,20 +85,28 @@ export const useCartStore = create<CartState>((set) => ({
 
   setDiscountTotal: (amount) => set({ discountTotal: Math.max(0, amount) }),
   setTaxRate: (rate) => set({ taxRate: Math.max(0, rate) }),
+  setTaxInclusive: (taxInclusive) => set({ taxInclusive }),
   setCustomer: (id) => set({ customerId: id }),
   loadDraft: (draft) =>
     set({
       lines: draft.lines.map((l) => ({ ...l })),
       discountTotal: draft.discountTotal,
       taxRate: draft.taxRate,
+      taxInclusive: draft.taxInclusive ?? false,
       customerId: draft.customerId,
     }),
-  clear: () => set({ lines: [], discountTotal: 0, taxRate: 0, customerId: null }),
+  clear: () =>
+    set({ lines: [], discountTotal: 0, taxRate: 0, taxInclusive: false, customerId: null }),
 }));
 
 /** Pure totals from a cart snapshot — reuses the transaction money core. */
 export function cartTotals(
-  s: Pick<CartState, "lines" | "discountTotal" | "taxRate">,
+  s: Pick<CartState, "lines" | "discountTotal" | "taxRate" | "taxInclusive">,
 ): Totals {
-  return calcTotals({ items: s.lines, discountTotal: s.discountTotal, taxRate: s.taxRate });
+  return calcTotals({
+    items: s.lines,
+    discountTotal: s.discountTotal,
+    taxRate: s.taxRate,
+    taxInclusive: s.taxInclusive,
+  });
 }

@@ -1,5 +1,6 @@
 import { ImageIcon } from "lucide-react";
 import type { Product } from "../model/types";
+import { sellPrice } from "../model/pricing";
 import { formatRupiah } from "@/shared/lib/currency";
 import { StockBadge } from "./StockBadge";
 
@@ -34,7 +35,7 @@ export function ProductCard({ product, onSelect }: ProductCardProps) {
       </div>
       <div className="flex flex-1 flex-col gap-1 p-2.5">
         <span className="line-clamp-2 text-sm font-medium text-fg">{product.name}</span>
-        <span className="text-sm font-semibold text-primary">{formatRupiah(product.price)}</span>
+        <span className="text-sm font-semibold text-primary">{formatRupiah(sellPrice(product))}</span>
         <div className="mt-auto pt-1">
           <StockBadge stock={product.stock} />
         </div>

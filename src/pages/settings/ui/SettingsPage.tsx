@@ -67,17 +67,28 @@ export function SettingsPage() {
             Aktifkan pajak
           </label>
           {settings.taxEnabled && (
-            <label className="block text-sm">
-              <span className="text-muted">Tarif pajak (%)</span>
-              <input
-                type="number"
-                min={0}
-                max={100}
-                value={Math.round(settings.taxRate * 100)}
-                onChange={(e) => update({ taxRate: (Number(e.target.value) || 0) / 100 })}
-                className={field}
-              />
-            </label>
+            <>
+              <label className="block text-sm">
+                <span className="text-muted">Tarif pajak (%)</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={Math.round(settings.taxRate * 100)}
+                  onChange={(e) => update({ taxRate: (Number(e.target.value) || 0) / 100 })}
+                  className={field}
+                />
+              </label>
+              <label className="flex items-center gap-2 text-sm text-fg">
+                <input
+                  type="checkbox"
+                  checked={settings.taxInclusive}
+                  onChange={(e) => update({ taxInclusive: e.target.checked })}
+                  className="accent-[var(--color-primary)]"
+                />
+                Harga sudah termasuk pajak (inclusive)
+              </label>
+            </>
           )}
         </Section>
 

@@ -6,8 +6,10 @@ export interface Category {
 export interface Product {
   id: string;
   name: string;
-  /** Integer Rupiah — no sub-unit. */
-  price: number;
+  /** Buy/cost price, integer Rupiah. Null until known (filled via purchasing). */
+  costPrice: number | null;
+  /** Sell price per tier id, integer Rupiah. Must contain the "umum" tier. */
+  prices: Record<string, number>;
   categoryId: string | null;
   /** Units on hand. Decrements on sale. */
   stock: number;

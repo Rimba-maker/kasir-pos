@@ -11,6 +11,8 @@ export interface TotalsInput {
   discountTotal: number;
   /** Tax rate 0..1. */
   taxRate: number;
+  /** When true, prices already include tax (extract it) instead of adding on top. */
+  taxInclusive?: boolean;
 }
 
 export interface Totals {
@@ -26,9 +28,14 @@ export interface Totals {
  *   taxTotal  = round(taxable * taxRate)
  *   total     = taxable + taxTotal
  */
-export function calcTotals({ items, discountTotal, taxRate }: TotalsInput): Totals {
+export function calcTotals({ items, discountTotal, taxRate, taxInclusive = false }: TotalsInput): Totals {
   const subtotal = items.reduce((sum, item) => sum + lineTotal(item), 0);
   const taxable = Math.max(0, subtotal - discountTotal);
+  if (taxInclusive) {
+    // Prices already include tax: extract it, total stays at taxable.
+    const taxTotal = taxable - Math.round(taxable / (1 + taxRate));
+    return { subtotal, taxTotal, total: taxable };
+  }
   const taxTotal = Math.round(taxable * taxRate);
   return { subtotal, taxTotal, total: taxable + taxTotal };
 }

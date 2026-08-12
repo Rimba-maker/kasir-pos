@@ -7,7 +7,7 @@ beforeEach(() => {
   useStockLedgerStore.setState({ entries: [] });
   useCatalogStore.setState({
     products: [
-      { id: "p1", name: "Kopi", price: 10_000, categoryId: null, stock: 5, barcode: null, imagePath: null },
+      { id: "p1", name: "Kopi", costPrice: null, prices: { umum: 10_000 }, categoryId: null, stock: 5, barcode: null, imagePath: null },
     ],
     categories: [],
   });

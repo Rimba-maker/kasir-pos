@@ -7,6 +7,8 @@ export interface StoreSettings {
   taxEnabled: boolean;
   /** Tax rate 0..1 (e.g. 0.11 for PPN 11%). */
   taxRate: number;
+  /** When true, product prices already include tax (extracted at checkout). */
+  taxInclusive: boolean;
   receiptFooter: string;
   /** Printer device/share path forwarded to the print command. */
   printerTarget: string;

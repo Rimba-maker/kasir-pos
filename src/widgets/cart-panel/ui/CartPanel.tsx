@@ -14,12 +14,13 @@ export function CartPanel({ onCheckout }: CartPanelProps) {
   const lines = useCartStore((s) => s.lines);
   const discountTotal = useCartStore((s) => s.discountTotal);
   const taxRate = useCartStore((s) => s.taxRate);
+  const taxInclusive = useCartStore((s) => s.taxInclusive);
   const changeQty = useCartStore((s) => s.changeQty);
   const removeLine = useCartStore((s) => s.removeLine);
   const setDiscountTotal = useCartStore((s) => s.setDiscountTotal);
   const clear = useCartStore((s) => s.clear);
 
-  const totals = cartTotals({ lines, discountTotal, taxRate });
+  const totals = cartTotals({ lines, discountTotal, taxRate, taxInclusive });
   const empty = lines.length === 0;
   const itemCount = lines.reduce((n, l) => n + l.qty, 0);
 

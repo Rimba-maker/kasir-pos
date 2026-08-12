@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ImageIcon, Loader2, Upload } from "lucide-react";
-import type { Category, Product } from "@/entities/product";
+import { sellPrice, type Category, type Product } from "@/entities/product";
 import { fileToDataUrl } from "@/shared/lib/image";
 import { Button } from "@/shared/ui/Button";
 import { saveProduct } from "../model/manage-product";
@@ -14,7 +14,8 @@ interface ProductFormProps {
 
 export function ProductForm({ product, categories, onDone }: ProductFormProps) {
   const [name, setName] = useState(product?.name ?? "");
-  const [price, setPrice] = useState(product?.price ?? 0);
+  const [price, setPrice] = useState(product ? sellPrice(product) : 0);
+  const [costPrice, setCostPrice] = useState(product?.costPrice ?? 0);
   const [stock, setStock] = useState(product?.stock ?? 0);
   const [categoryId, setCategoryId] = useState<string | null>(product?.categoryId ?? null);
   const [barcode, setBarcode] = useState(product?.barcode ?? "");
@@ -38,10 +39,12 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
+    const cost = Math.max(0, Math.round(costPrice));
     await saveProduct({
       id: product?.id ?? crypto.randomUUID(),
       name: name.trim(),
-      price: Math.max(0, Math.round(price)),
+      costPrice: cost > 0 ? cost : null,
+      prices: { ...(product?.prices ?? {}), umum: Math.max(0, Math.round(price)) },
       stock: Math.max(0, Math.round(stock)),
       categoryId,
       barcode: barcode.trim() || null,
@@ -61,12 +64,22 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
       </label>
       <div className="grid grid-cols-2 gap-3">
         <label className="block text-sm">
-          <span className="text-muted">Harga</span>
+          <span className="text-muted">Harga jual</span>
           <input
             type="number"
             min={0}
             value={price || ""}
             onChange={(e) => setPrice(Number(e.target.value) || 0)}
+            className={field}
+          />
+        </label>
+        <label className="block text-sm">
+          <span className="text-muted">Harga beli</span>
+          <input
+            type="number"
+            min={0}
+            value={costPrice || ""}
+            onChange={(e) => setCostPrice(Number(e.target.value) || 0)}
             className={field}
           />
         </label>

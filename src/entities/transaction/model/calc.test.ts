@@ -38,6 +38,17 @@ test("calcTotals: tax rounds to whole Rupiah", () => {
   expect(t.total).toBe(3_700);
 });
 
+test("calcTotals: inclusive tax is extracted, not added on top", () => {
+  const t = calcTotals({
+    items: [{ unitPrice: 111_000, qty: 1, discount: 0 }],
+    discountTotal: 0,
+    taxRate: 0.11,
+    taxInclusive: true,
+  });
+  // 111_000 already includes 11% → base 100_000, tax 11_000, total unchanged
+  expect(t).toEqual({ subtotal: 111_000, taxTotal: 11_000, total: 111_000 });
+});
+
 test("calcTotals: discount larger than subtotal clamps taxable to 0", () => {
   const t = calcTotals({
     items: [{ unitPrice: 10_000, qty: 1, discount: 0 }],

@@ -34,14 +34,17 @@ export function TillPage() {
   const lines = useCartStore((s) => s.lines);
   const discountTotal = useCartStore((s) => s.discountTotal);
   const taxRate = useCartStore((s) => s.taxRate);
+  const taxInclusive = useCartStore((s) => s.taxInclusive);
   const setTaxRate = useCartStore((s) => s.setTaxRate);
-  const { total } = cartTotals({ lines, discountTotal, taxRate });
+  const setTaxInclusive = useCartStore((s) => s.setTaxInclusive);
+  const { total } = cartTotals({ lines, discountTotal, taxRate, taxInclusive });
   const itemCount = lines.reduce((n, l) => n + l.qty, 0);
 
-  // Keep the cart's tax rate in sync with settings.
+  // Keep the cart's tax rate + mode in sync with settings.
   useEffect(() => {
     setTaxRate(settings.taxEnabled ? settings.taxRate : 0);
-  }, [settings.taxEnabled, settings.taxRate, setTaxRate]);
+    setTaxInclusive(settings.taxEnabled && settings.taxInclusive);
+  }, [settings.taxEnabled, settings.taxRate, settings.taxInclusive, setTaxRate, setTaxInclusive]);
 
   async function onPaymentConfirmed(payment: Payment) {
     const cart = useCartStore.getState();
@@ -49,6 +52,7 @@ export function TillPage() {
       lines: cart.lines,
       discountTotal: cart.discountTotal,
       taxRate: cart.taxRate,
+      taxInclusive: cart.taxInclusive,
       status: "paid",
       payment,
       customerId: cart.customerId,

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pencil, Plus, Tags, Trash2 } from "lucide-react";
-import { StockBadge, useCatalogStore, type Product } from "@/entities/product";
+import { StockBadge, sellPrice, useCatalogStore, type Product } from "@/entities/product";
 import { ProductForm, deleteProduct, deleteProducts } from "@/features/manage-product";
 import { CategoryManager } from "@/features/manage-category";
 import { formatRupiah } from "@/shared/lib/currency";
@@ -89,7 +89,7 @@ export function CatalogPage() {
                   </td>
                   <td className="px-3 py-2.5 font-medium text-fg">{p.name}</td>
                   <td className="px-3 py-2.5 text-muted">{categoryName(p.categoryId)}</td>
-                  <td className="px-3 py-2.5 text-right tabular-nums text-fg">{formatRupiah(p.price)}</td>
+                  <td className="px-3 py-2.5 text-right tabular-nums text-fg">{formatRupiah(sellPrice(p))}</td>
                   <td className="px-3 py-2.5">
                     <StockBadge stock={p.stock} />
                   </td>

@@ -10,6 +10,7 @@ const defaults: StoreSettings = {
   currencySymbol: CURRENCY_SYMBOL,
   taxEnabled: false,
   taxRate: DEFAULT_TAX_RATE,
+  taxInclusive: false,
   receiptFooter: "Terima kasih telah berbelanja",
   printerTarget: "",
   qrisImagePath: "",

@@ -10,7 +10,7 @@ const validSnapshot: BackupData = {
   version: 1,
   exportedAt: "2026-08-12T00:00:00.000Z",
   products: [
-    { id: "p1", name: "Kopi", price: 10_000, categoryId: null, stock: 5, barcode: null, imagePath: null },
+    { id: "p1", name: "Kopi", costPrice: null, prices: { umum: 10_000 }, categoryId: null, stock: 5, barcode: null, imagePath: null },
   ],
   categories: [{ id: "c1", name: "Minuman" }],
   customers: [{ id: "cu1", name: "Budi", phone: "0812" }],
@@ -22,6 +22,7 @@ const validSnapshot: BackupData = {
     currencySymbol: "Rp",
     taxEnabled: false,
     taxRate: 0,
+    taxInclusive: false,
     receiptFooter: "",
     printerTarget: "",
     qrisImagePath: "",
@@ -65,7 +66,7 @@ beforeEach(() => {
 test("restore replaces all local data with the snapshot", () => {
   // pre-existing data that must be overwritten, not merged
   useCatalogStore.getState().setProducts([
-    { id: "old", name: "Teh", price: 5_000, categoryId: null, stock: 1, barcode: null, imagePath: null },
+    { id: "old", name: "Teh", costPrice: null, prices: { umum: 5_000 }, categoryId: null, stock: 1, barcode: null, imagePath: null },
   ]);
   useCustomerStore.getState().upsert({ id: "old", name: "Lama", phone: "" });
 
