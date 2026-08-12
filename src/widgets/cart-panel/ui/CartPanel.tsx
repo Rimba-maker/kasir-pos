@@ -1,5 +1,6 @@
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import { cartTotals, lineTotal, useCartStore } from "@/entities/transaction";
+import { applicablePromo, usePromoStore } from "@/entities/promo";
 import { formatRupiah } from "@/shared/lib/currency";
 import { Button } from "@/shared/ui/Button";
 import { CustomerSelect } from "@/features/quick-add-customer";
@@ -19,8 +20,11 @@ export function CartPanel({ onCheckout }: CartPanelProps) {
   const removeLine = useCartStore((s) => s.removeLine);
   const setDiscountTotal = useCartStore((s) => s.setDiscountTotal);
   const clear = useCartStore((s) => s.clear);
+  const promos = usePromoStore((s) => s.promos);
 
-  const totals = cartTotals({ lines, discountTotal, taxRate, taxInclusive });
+  const promo = applicablePromo(promos, lines);
+  const promoAmount = promo?.discount ?? 0;
+  const totals = cartTotals({ lines, discountTotal: discountTotal + promoAmount, taxRate, taxInclusive });
   const empty = lines.length === 0;
   const itemCount = lines.reduce((n, l) => n + l.qty, 0);
 
@@ -114,6 +118,12 @@ export function CartPanel({ onCheckout }: CartPanelProps) {
             className="w-28 rounded-md border border-border bg-surface px-2 py-1 text-right tabular-nums text-fg outline-none focus:border-primary"
           />
         </div>
+        {promoAmount > 0 && (
+          <div className="flex items-center justify-between text-primary">
+            <span className="truncate">Promo · {promo!.promo.name}</span>
+            <span className="tabular-nums">− {formatRupiah(promoAmount)}</span>
+          </div>
+        )}
         {taxRate > 0 && (
           <Row label={`Pajak (${Math.round(taxRate * 100)}%)`} value={formatRupiah(totals.taxTotal)} />
         )}

@@ -5,6 +5,7 @@ import { useCatalogStore } from "@/entities/product";
 import { recordStockMovement } from "@/entities/stock-ledger";
 import { consumeBatchesFefo } from "@/entities/batch";
 import { currentShift, useShiftStore } from "@/entities/shift";
+import { applicablePromo, usePromoStore } from "@/entities/promo";
 import { useSettingsStore } from "@/entities/store-settings";
 import { buildTransaction, cartTotals, useCartStore, useSalesStore, type Payment, type Transaction } from "@/entities/transaction";
 import { BarcodeSearch } from "@/features/add-to-cart";
@@ -41,7 +42,9 @@ export function TillPage() {
   const customerId = useCartStore((s) => s.customerId);
   const setTaxRate = useCartStore((s) => s.setTaxRate);
   const setTaxInclusive = useCartStore((s) => s.setTaxInclusive);
-  const { total } = cartTotals({ lines, discountTotal, taxRate, taxInclusive });
+  const promos = usePromoStore((s) => s.promos);
+  const promoAmount = applicablePromo(promos, lines)?.discount ?? 0;
+  const { total } = cartTotals({ lines, discountTotal: discountTotal + promoAmount, taxRate, taxInclusive });
   const itemCount = lines.reduce((n, l) => n + l.qty, 0);
 
   // Keep the cart's tax rate + mode in sync with settings.
@@ -52,9 +55,10 @@ export function TillPage() {
 
   function saleBase() {
     const cart = useCartStore.getState();
+    const promoAmt = applicablePromo(usePromoStore.getState().promos, cart.lines)?.discount ?? 0;
     return {
       lines: cart.lines,
-      discountTotal: cart.discountTotal,
+      discountTotal: cart.discountTotal + promoAmt,
       taxRate: cart.taxRate,
       taxInclusive: cart.taxInclusive,
       status: "paid" as const,
