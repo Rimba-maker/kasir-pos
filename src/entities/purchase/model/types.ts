@@ -37,3 +37,22 @@ export interface GoodsReceipt {
   at: string;
   lines: GoodsReceiptLine[];
 }
+
+export interface SupplierReturnLine {
+  productId: string;
+  batchId?: string | null;
+  /** Quantity returned, BASE units. */
+  qty: number;
+  /** Cost per BASE unit (reduces supplier debt). */
+  unitCost: number;
+}
+
+export interface SupplierReturn {
+  id: string;
+  supplierId: string;
+  poId: string | null;
+  receiptId: string | null;
+  at: string;
+  reason: string | null;
+  lines: SupplierReturnLine[];
+}

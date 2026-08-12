@@ -7,6 +7,7 @@ import {
   poStatus,
   receivedBase,
   receivePurchase,
+  returnPurchase,
   usePurchaseStore,
   type POLine,
   type PurchaseOrder,
@@ -28,6 +29,7 @@ export function PurchaseOrdersPage() {
   const suppliers = useSupplierStore((s) => s.suppliers);
   const [creating, setCreating] = useState(false);
   const [receiving, setReceiving] = useState<PurchaseOrder | null>(null);
+  const [returning, setReturning] = useState<PurchaseOrder | null>(null);
 
   const supplierName = (id: string) => suppliers.find((s) => s.id === id)?.name ?? "—";
   const poTotal = (po: PurchaseOrder) => po.lines.reduce((sum, l) => sum + l.qty * l.unitCost, 0);
@@ -75,11 +77,18 @@ export function PurchaseOrdersPage() {
                     </td>
                     <td className="px-3 py-2.5 text-right tabular-nums text-fg">{formatRupiah(poTotal(po))}</td>
                     <td className="px-3 py-2.5 text-right">
-                      {status !== "completed" && status !== "draft" && (
-                        <Button variant="outline" size="sm" onClick={() => setReceiving(po)}>
-                          Terima
-                        </Button>
-                      )}
+                      <div className="flex justify-end gap-1.5">
+                        {status !== "completed" && status !== "draft" && (
+                          <Button variant="outline" size="sm" onClick={() => setReceiving(po)}>
+                            Terima
+                          </Button>
+                        )}
+                        {(status === "partial" || status === "completed") && (
+                          <Button variant="outline" size="sm" onClick={() => setReturning(po)}>
+                            Retur
+                          </Button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -94,6 +103,9 @@ export function PurchaseOrdersPage() {
       </Modal>
       <Modal open={receiving !== null} title="Terima Barang" onClose={() => setReceiving(null)}>
         {receiving && <ReceiveForm po={receiving} onDone={() => setReceiving(null)} />}
+      </Modal>
+      <Modal open={returning !== null} title="Retur ke Supplier" onClose={() => setReturning(null)}>
+        {returning && <ReturnForm po={returning} onDone={() => setReturning(null)} />}
       </Modal>
     </div>
   );
@@ -264,6 +276,64 @@ function ReceiveForm({ po, onDone }: { po: PurchaseOrder; onDone: () => void }) 
       <div className="flex gap-2 pt-1">
         <Button variant="outline" onClick={onDone} className="flex-1">Batal</Button>
         <Button type="submit" variant="primary" className="flex-1">Terima</Button>
+      </div>
+    </form>
+  );
+}
+
+function ReturnForm({ po, onDone }: { po: PurchaseOrder; onDone: () => void }) {
+  const products = useCatalogStore((s) => s.products);
+  const receipts = usePurchaseStore((s) => s.receipts);
+  const received = receivedBase(receipts, po.id);
+
+  const rows = Object.keys(received)
+    .map((productId) => {
+      const line = po.lines.find((l) => l.productId === productId)!;
+      const factor = line.qty > 0 ? line.baseQty / line.qty : 1;
+      return { productId, max: received[productId] ?? 0, costPerBase: Math.round(line.unitCost / factor) };
+    })
+    .filter((r) => r.max > 0);
+
+  const [qtys, setQtys] = useState<Record<string, number>>({});
+  const name = (id: string) => products.find((p) => p.id === id)?.name ?? id;
+  const baseUnit = (id: string) => products.find((p) => p.id === id)?.baseUnit ?? "pcs";
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const lines = rows
+      .map((r) => ({ productId: r.productId, qty: Math.min(qtys[r.productId] ?? 0, r.max), unitCost: r.costPerBase }))
+      .filter((l) => l.qty > 0);
+    if (lines.length === 0) return;
+    returnPurchase({ supplierId: po.supplierId, poId: po.id, lines });
+    onDone();
+  }
+
+  return (
+    <form onSubmit={submit} className="space-y-3">
+      {rows.length === 0 ? (
+        <p className="text-sm text-muted">Belum ada barang diterima untuk diretur.</p>
+      ) : (
+        <div className="space-y-2">
+          {rows.map((r) => (
+            <div key={r.productId} className="flex items-center gap-2 text-sm">
+              <span className="flex-1 text-fg">{name(r.productId)}</span>
+              <span className="text-xs text-muted">maks {r.max}</span>
+              <input
+                type="number"
+                min={0}
+                max={r.max}
+                value={qtys[r.productId] ?? 0}
+                onChange={(e) => setQtys((q) => ({ ...q, [r.productId]: Number(e.target.value) || 0 }))}
+                className={`${field} mt-0 w-20`}
+              />
+              <span className="w-10 text-xs text-muted">{baseUnit(r.productId)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="flex gap-2 pt-1">
+        <Button variant="outline" onClick={onDone} className="flex-1">Batal</Button>
+        <Button type="submit" variant="primary" className="flex-1">Retur</Button>
       </div>
     </form>
   );

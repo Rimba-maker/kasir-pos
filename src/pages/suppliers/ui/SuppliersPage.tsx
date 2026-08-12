@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pencil, Plus, Trash2, Truck, Wallet } from "lucide-react";
 import { supplierPaid, useSupplierStore, type Supplier } from "@/entities/supplier";
-import { poPayables, usePurchaseStore } from "@/entities/purchase";
+import { poPayables, supplierReturnsValue, usePurchaseStore } from "@/entities/purchase";
 import { formatRupiah } from "@/shared/lib/currency";
 import { Button } from "@/shared/ui/Button";
 import { Modal } from "@/shared/ui/Modal";
@@ -14,6 +14,7 @@ export function SuppliersPage() {
   const addPayment = useSupplierStore((s) => s.addPayment);
   const orders = usePurchaseStore((s) => s.orders);
   const receipts = usePurchaseStore((s) => s.receipts);
+  const returns = usePurchaseStore((s) => s.returns);
   const [editing, setEditing] = useState<Supplier | null | undefined>(undefined); // undefined = closed
   const [paying, setPaying] = useState<Supplier | null>(null);
 
@@ -21,7 +22,7 @@ export function SuppliersPage() {
   const balanceOf = (supplierId: string) => {
     const rec = receipts.filter((r) => supplierByPo.get(r.poId) === supplierId);
     const charged = poPayables(orders, rec).reduce((sum, p) => sum + p.amount, 0);
-    return charged - supplierPaid(payments, supplierId);
+    return charged - supplierPaid(payments, supplierId) - supplierReturnsValue(returns, supplierId);
   };
 
   return (
