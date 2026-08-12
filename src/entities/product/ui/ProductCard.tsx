@@ -1,6 +1,8 @@
 import { ImageIcon } from "lucide-react";
 import type { Product } from "../model/types";
 import { sellPrice } from "../model/pricing";
+import { kitStock } from "../model/kit";
+import { useCatalogStore } from "../model/store";
 import { formatRupiah } from "@/shared/lib/currency";
 import { StockBadge } from "./StockBadge";
 
@@ -11,7 +13,9 @@ interface ProductCardProps {
 
 /** Product tile: photo, name, price, stock. Disabled when out of stock. */
 export function ProductCard({ product, onSelect }: ProductCardProps) {
-  const soldOut = product.stock <= 0;
+  const products = useCatalogStore((s) => s.products);
+  const stock = product.isKit ? kitStock(product, products) : product.stock;
+  const soldOut = stock <= 0;
 
   return (
     <button
@@ -37,7 +41,7 @@ export function ProductCard({ product, onSelect }: ProductCardProps) {
         <span className="line-clamp-2 text-sm font-medium text-fg">{product.name}</span>
         <span className="text-sm font-semibold text-primary">{formatRupiah(sellPrice(product))}</span>
         <div className="mt-auto pt-1">
-          <StockBadge stock={product.stock} />
+          <StockBadge stock={stock} />
         </div>
       </div>
     </button>

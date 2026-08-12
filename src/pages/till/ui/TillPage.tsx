@@ -67,8 +67,15 @@ export function TillPage() {
     }
     const products = useCatalogStore.getState().products;
     tx.items.forEach((i) => {
+      const prod = products.find((p) => p.id === i.productId);
+      if (prod?.isKit) {
+        // A kit has no stock of its own — consume its components.
+        for (const c of prod.components ?? [])
+          recordStockMovement({ productId: c.productId, type: "sale", qty: -(c.qty * i.qty), refType: "transaction", refId: tx.id });
+        return;
+      }
       recordStockMovement({ productId: i.productId, type: "sale", qty: -i.qty, refType: "transaction", refId: tx.id });
-      if (products.find((p) => p.id === i.productId)?.trackBatch) consumeBatchesFefo(i.productId, i.qty);
+      if (prod?.trackBatch) consumeBatchesFefo(i.productId, i.qty);
     });
     useSalesStore.getState().add(tx);
     cart.clear();

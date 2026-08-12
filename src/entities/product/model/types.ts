@@ -12,6 +12,12 @@ export interface ProductUnit {
   prices?: Record<string, number>;
 }
 
+export interface KitComponent {
+  productId: string;
+  /** Base-unit quantity of this component per one kit. */
+  qty: number;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -25,6 +31,10 @@ export interface Product {
   units: ProductUnit[];
   /** When true, stock is tracked per batch with expiry (FEFO). */
   trackBatch?: boolean;
+  /** When true, this is a kit: selling it decrements its components. */
+  isKit?: boolean;
+  /** Component products consumed when a kit is sold. */
+  components?: KitComponent[];
   categoryId: string | null;
   /** Units on hand, in base unit. Decrements on sale. */
   stock: number;

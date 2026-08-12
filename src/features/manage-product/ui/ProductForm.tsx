@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { ImageIcon, Loader2, Trash2, Upload } from "lucide-react";
-import { sellPrice, type Category, type Product, type ProductUnit } from "@/entities/product";
+import {
+  sellPrice,
+  useCatalogStore,
+  type Category,
+  type KitComponent,
+  type Product,
+  type ProductUnit,
+} from "@/entities/product";
 import { fileToDataUrl } from "@/shared/lib/image";
 import { Button } from "@/shared/ui/Button";
 import { saveProduct } from "../model/manage-product";
@@ -20,6 +27,10 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
   const [baseUnit, setBaseUnit] = useState(product?.baseUnit ?? "pcs");
   const [units, setUnits] = useState<ProductUnit[]>(product?.units ?? []);
   const [trackBatch, setTrackBatch] = useState(product?.trackBatch ?? false);
+  const [isKit, setIsKit] = useState(product?.isKit ?? false);
+  const [components, setComponents] = useState<KitComponent[]>(product?.components ?? []);
+  const allProducts = useCatalogStore((s) => s.products);
+  const componentChoices = allProducts.filter((p) => p.id !== product?.id && !p.isKit);
   const [categoryId, setCategoryId] = useState<string | null>(product?.categoryId ?? null);
   const [barcode, setBarcode] = useState(product?.barcode ?? "");
   const [imagePath, setImagePath] = useState<string | null>(product?.imagePath ?? null);
@@ -53,6 +64,10 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
         .filter((u) => u.name.trim() && u.factor > 0)
         .map((u) => ({ name: u.name.trim(), factor: Math.round(u.factor), barcode: u.barcode?.trim() || null })),
       trackBatch,
+      isKit,
+      components: isKit
+        ? components.filter((c) => c.productId && c.qty > 0).map((c) => ({ productId: c.productId, qty: Math.round(c.qty) }))
+        : undefined,
       stock: Math.max(0, Math.round(stock)),
       categoryId,
       barcode: barcode.trim() || null,
@@ -65,6 +80,12 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
     setUnits((us) => us.map((u, j) => (j === i ? { ...u, ...patch } : u)));
   const addUnit = () => setUnits((us) => [...us, { name: "", factor: 1 }]);
   const removeUnit = (i: number) => setUnits((us) => us.filter((_, j) => j !== i));
+
+  const updateComp = (i: number, patch: Partial<KitComponent>) =>
+    setComponents((cs) => cs.map((c, j) => (j === i ? { ...c, ...patch } : c)));
+  const addComp = () =>
+    setComponents((cs) => [...cs, { productId: componentChoices[0]?.id ?? "", qty: 1 }]);
+  const removeComp = (i: number) => setComponents((cs) => cs.filter((_, j) => j !== i));
 
   const field =
     "mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-fg outline-none focus:border-primary";
@@ -193,6 +214,62 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
         />
         Lacak batch &amp; kadaluarsa (FEFO)
       </label>
+
+      <label className="flex items-center gap-2 text-sm text-fg">
+        <input
+          type="checkbox"
+          checked={isKit}
+          onChange={(e) => setIsKit(e.target.checked)}
+          className="accent-[var(--color-primary)]"
+        />
+        Produk paket / kit (kurangi komponen saat terjual)
+      </label>
+      {isKit && (
+        <div className="text-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-muted">Komponen</span>
+            <button
+              type="button"
+              onClick={addComp}
+              disabled={componentChoices.length === 0}
+              className="cursor-pointer text-xs font-medium text-primary hover:underline"
+            >
+              + Tambah komponen
+            </button>
+          </div>
+          <div className="mt-1.5 space-y-2">
+            {components.map((c, i) => (
+              <div key={i} className="flex items-center gap-1.5">
+                <select
+                  value={c.productId}
+                  onChange={(e) => updateComp(i, { productId: e.target.value })}
+                  className={`${field} mt-0 flex-1`}
+                >
+                  {componentChoices.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+                <span className="shrink-0 text-xs text-muted">×</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={c.qty || ""}
+                  onChange={(e) => updateComp(i, { qty: Number(e.target.value) || 1 })}
+                  className={`${field} mt-0 w-16`}
+                />
+                <button
+                  type="button"
+                  onClick={() => removeComp(i)}
+                  aria-label="Hapus komponen"
+                  className="shrink-0 cursor-pointer text-muted hover:text-danger"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="text-sm">
         <span className="text-muted">Foto produk</span>

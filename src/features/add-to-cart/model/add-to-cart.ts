@@ -1,4 +1,4 @@
-import { sellPrice, type Product } from "@/entities/product";
+import { kitStock, sellPrice, useCatalogStore, type Product } from "@/entities/product";
 import { useCartStore } from "@/entities/transaction";
 
 /**
@@ -8,7 +8,8 @@ import { useCartStore } from "@/entities/transaction";
 export function addProductToCart(product: Product): boolean {
   const cart = useCartStore.getState();
   const inCart = cart.lines.find((l) => l.productId === product.id)?.qty ?? 0;
-  if (product.stock <= inCart) return false;
+  const stock = product.isKit ? kitStock(product, useCatalogStore.getState().products) : product.stock;
+  if (stock <= inCart) return false;
   cart.addItem({ id: product.id, name: product.name, price: sellPrice(product) });
   return true;
 }
