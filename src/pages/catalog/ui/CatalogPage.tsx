@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Pencil, Plus, Tags, Trash2 } from "lucide-react";
+import { useRef, useState } from "react";
+import { FileDown, FileUp, Pencil, Plus, Tags, Trash2 } from "lucide-react";
 import { StockBadge, sellPrice, useCatalogStore, type Product } from "@/entities/product";
 import { ProductForm, deleteProduct, deleteProducts } from "@/features/manage-product";
 import { CategoryManager } from "@/features/manage-category";
+import { exportRowsXlsx, importRowsXlsx, productToRow, rowToProduct } from "@/features/export";
 import { formatRupiah } from "@/shared/lib/currency";
 import { Button } from "@/shared/ui/Button";
 import { Modal } from "@/shared/ui/Modal";
@@ -13,6 +14,25 @@ export function CatalogPage() {
   const [editing, setEditing] = useState<Product | null | undefined>(undefined); // undefined = closed
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [showCategories, setShowCategories] = useState(false);
+  const fileInput = useRef<HTMLInputElement>(null);
+
+  function onExport() {
+    exportRowsXlsx(products.map(productToRow), "Produk", "produk.xlsx");
+  }
+
+  async function onImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    try {
+      const rows = await importRowsXlsx(file);
+      const imported = rows.map(rowToProduct).filter((p) => p.name);
+      imported.forEach((p) => useCatalogStore.getState().upsertProduct(p));
+      alert(`${imported.length} produk diimpor.`);
+    } catch (err) {
+      alert(`Gagal impor: ${String(err)}`);
+    }
+  }
 
   const categoryName = (id: string | null) =>
     id ? (categories.find((c) => c.id === id)?.name ?? "—") : "—";
@@ -43,6 +63,15 @@ export function CatalogPage() {
             <Tags className="h-4 w-4" />
             Kategori
           </Button>
+          <Button variant="outline" size="sm" onClick={onExport}>
+            <FileDown className="h-4 w-4" />
+            Excel
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => fileInput.current?.click()}>
+            <FileUp className="h-4 w-4" />
+            Impor
+          </Button>
+          <input ref={fileInput} type="file" accept=".xlsx,.xls" className="sr-only" onChange={(e) => void onImport(e)} />
           {selected.size > 0 && (
             <Button variant="danger" size="sm" onClick={bulkDelete}>
               <Trash2 className="h-4 w-4" />

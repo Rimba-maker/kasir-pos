@@ -10,9 +10,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { FileDown } from "lucide-react";
 import { useSalesStore } from "@/entities/transaction";
 import { salesByDay, salesSummary, topProducts } from "@/features/dashboard";
+import { exportSalesReportPdf } from "@/features/export";
 import { formatRupiah } from "@/shared/lib/currency";
+import { Button } from "@/shared/ui/Button";
 
 type Period = "today" | "7d" | "30d" | "all";
 const PERIODS: { key: Period; label: string }[] = [
@@ -49,6 +52,7 @@ export function DashboardPage() {
     <div className="h-full overflow-auto p-4 sm:p-5">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-xl font-bold text-fg">Dashboard</h1>
+        <div className="flex items-center gap-2">
         <div className="flex gap-1 rounded-lg border border-border bg-surface p-1">
           {PERIODS.map((p) => (
             <button
@@ -62,6 +66,15 @@ export function DashboardPage() {
               {p.label}
             </button>
           ))}
+        </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => exportSalesReportPdf(summary, top, PERIODS.find((p) => p.key === period)!.label)}
+          >
+            <FileDown className="h-4 w-4" />
+            PDF
+          </Button>
         </div>
       </div>
 
