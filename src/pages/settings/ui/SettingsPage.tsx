@@ -3,6 +3,7 @@ import { Download, Upload } from "lucide-react";
 import { useSettingsStore } from "@/entities/store-settings";
 import { downloadBackup } from "@/features/export-backup";
 import { parseBackup, restoreBackup } from "@/features/import-backup";
+import { logAudit } from "@/entities/audit";
 import { Button } from "@/shared/ui/Button";
 
 export function SettingsPage() {
@@ -29,6 +30,7 @@ export function SettingsPage() {
     }
     if (!confirm("Impor akan menimpa SEMUA data saat ini. Lanjutkan?")) return;
     restoreBackup(result.data);
+    logAudit({ staffId: null, action: "backup.import", entity: "backup", entityId: null });
     alert("Data berhasil dipulihkan dari backup.");
   }
 

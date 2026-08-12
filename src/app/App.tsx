@@ -9,6 +9,7 @@ import {
   Package,
   PackageSearch,
   Receipt,
+  ScrollText,
   Settings2,
   ShoppingBag,
   Store,
@@ -34,6 +35,7 @@ import { CustomersPage } from "@/pages/customers";
 import { PromosPage } from "@/pages/promos";
 import { LoyaltyPage } from "@/pages/loyalty";
 import { DashboardPage } from "@/pages/dashboard";
+import { AuditPage } from "@/pages/audit";
 import { SalesHistoryPage } from "@/pages/sales-history";
 import { StaffPage } from "@/pages/staff";
 import { SettingsPage } from "@/pages/settings";
@@ -41,7 +43,7 @@ import { categoryApi, productApi, isTauri } from "@/shared/api/pos";
 import { ThemeToggle } from "@/shared/ui/ThemeToggle";
 import { demoCategories, demoProducts } from "./demo-data";
 
-type Route = "till" | "dashboard" | "catalog" | "suppliers" | "purchases" | "opname" | "batches" | "reorder" | "shift" | "customers" | "promos" | "loyalty" | "sales" | "staff" | "settings";
+type Route = "till" | "dashboard" | "catalog" | "suppliers" | "purchases" | "opname" | "batches" | "reorder" | "shift" | "customers" | "promos" | "loyalty" | "sales" | "staff" | "audit" | "settings";
 
 // perm: null = always allowed (cashier). Otherwise the flag required.
 // flag: optional settings toggle that must be on for the item to show.
@@ -60,6 +62,7 @@ const NAV: { key: Route; label: string; icon: LucideIcon; perm: keyof StaffPermi
   { key: "loyalty", label: "Loyalty", icon: Ticket, perm: "products" },
   { key: "sales", label: "Riwayat", icon: BarChart3, perm: "sales" },
   { key: "staff", label: "Staff", icon: Users, perm: "users" },
+  { key: "audit", label: "Audit", icon: ScrollText, perm: "users" },
   { key: "settings", label: "Pengaturan", icon: Settings2, perm: "settings" },
 ];
 
@@ -181,6 +184,7 @@ export function App() {
           {route === "loyalty" && <LoyaltyPage />}
           {route === "sales" && <SalesHistoryPage onResumed={() => setRoute("till")} />}
           {route === "staff" && <StaffPage />}
+          {route === "audit" && <AuditPage />}
           {route === "settings" && <SettingsPage />}
         </main>
       </div>

@@ -1,5 +1,6 @@
 import { useCatalogStore } from "@/entities/product";
 import { recordStockMovement } from "@/entities/stock-ledger";
+import { logAudit } from "@/entities/audit";
 import { useOpnameStore } from "./store";
 import type { OpnameLine, StockOpname } from "./types";
 
@@ -36,5 +37,6 @@ export function postOpname(
     lines: lines.map((l) => ({ productId: l.productId, countedQty: Math.round(l.countedQty) })),
   };
   useOpnameStore.getState().add(opname);
+  logAudit({ staffId: opts.byStaffId ?? null, action: "opname.post", entity: "opname", entityId: opname.id, after: { lines: opname.lines.length } });
   return opname;
 }

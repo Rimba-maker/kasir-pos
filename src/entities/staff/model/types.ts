@@ -11,6 +11,8 @@ export interface Staff {
   name: string;
   /** Local login PIN (plain for MVP; hash if login is enforced later). */
   pin: string;
+  /** Assigned role preset (seeds permissions; can still be overridden). */
+  roleId?: string;
   permissions: StaffPermissions;
 }
 

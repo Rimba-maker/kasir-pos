@@ -1,6 +1,8 @@
 import { useState } from "react";
 import {
   PERMISSION_LABELS,
+  ROLE_PRESETS,
+  rolePermissions,
   useStaffStore,
   type Staff,
   type StaffPermissions,
@@ -24,7 +26,13 @@ export function StaffForm({ staff, onDone }: StaffFormProps) {
   const upsert = useStaffStore((s) => s.upsert);
   const [name, setName] = useState(staff?.name ?? "");
   const [pin, setPin] = useState(staff?.pin ?? "");
+  const [roleId, setRoleId] = useState(staff?.roleId ?? "");
   const [perms, setPerms] = useState<StaffPermissions>(staff?.permissions ?? EMPTY_PERMS);
+
+  function pickRole(id: string) {
+    setRoleId(id);
+    if (id) setPerms(rolePermissions(id));
+  }
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -33,6 +41,7 @@ export function StaffForm({ staff, onDone }: StaffFormProps) {
       id: staff?.id ?? crypto.randomUUID(),
       name: name.trim(),
       pin: pin.trim(),
+      roleId: roleId || undefined,
       permissions: perms,
     });
     onDone();
@@ -50,6 +59,16 @@ export function StaffForm({ staff, onDone }: StaffFormProps) {
       <label className="block text-sm">
         <span className="text-muted">PIN</span>
         <input value={pin} onChange={(e) => setPin(e.target.value)} className={field} inputMode="numeric" />
+      </label>
+
+      <label className="block text-sm">
+        <span className="text-muted">Role</span>
+        <select value={roleId} onChange={(e) => pickRole(e.target.value)} className={field}>
+          <option value="">Kustom</option>
+          {ROLE_PRESETS.map((r) => (
+            <option key={r.id} value={r.id}>{r.name}</option>
+          ))}
+        </select>
       </label>
 
       <fieldset className="space-y-2">
