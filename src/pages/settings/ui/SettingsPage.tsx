@@ -1,11 +1,36 @@
-import { Download } from "lucide-react";
+import { useRef } from "react";
+import { Download, Upload } from "lucide-react";
 import { useSettingsStore } from "@/entities/store-settings";
 import { downloadBackup } from "@/features/export-backup";
+import { parseBackup, restoreBackup } from "@/features/import-backup";
 import { Button } from "@/shared/ui/Button";
 
 export function SettingsPage() {
   const settings = useSettingsStore((s) => s.settings);
   const update = useSettingsStore((s) => s.update);
+  const fileInput = useRef<HTMLInputElement>(null);
+
+  async function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-picking the same file
+    if (!file) return;
+
+    let raw: unknown;
+    try {
+      raw = JSON.parse(await file.text());
+    } catch {
+      alert("File bukan JSON yang valid.");
+      return;
+    }
+    const result = parseBackup(raw);
+    if (!result.ok) {
+      alert(`Impor gagal: ${result.error}`);
+      return;
+    }
+    if (!confirm("Impor akan menimpa SEMUA data saat ini. Lanjutkan?")) return;
+    restoreBackup(result.data);
+    alert("Data berhasil dipulihkan dari backup.");
+  }
 
   const field =
     "mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-fg outline-none focus:border-primary";
@@ -74,10 +99,23 @@ export function SettingsPage() {
             Ekspor seluruh data (produk, transaksi, pelanggan, staff, pengaturan) ke satu file
             JSON sebagai cadangan manual.
           </p>
-          <Button variant="primary" size="sm" onClick={() => void downloadBackup()}>
-            <Download className="h-4 w-4" />
-            Ekspor Backup (.json)
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="primary" size="sm" onClick={() => void downloadBackup()}>
+              <Download className="h-4 w-4" />
+              Ekspor Backup (.json)
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => fileInput.current?.click()}>
+              <Upload className="h-4 w-4" />
+              Impor Backup
+            </Button>
+          </div>
+          <input
+            ref={fileInput}
+            type="file"
+            accept="application/json,.json"
+            className="sr-only"
+            onChange={(e) => void onImportFile(e)}
+          />
         </Section>
 
         <p className="text-xs text-muted">Perubahan tersimpan otomatis di perangkat ini.</p>
