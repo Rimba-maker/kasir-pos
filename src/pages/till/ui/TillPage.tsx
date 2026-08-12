@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Banknote, PauseCircle, Printer, QrCode, ShoppingCart } from "lucide-react";
 import { formatRupiah } from "@/shared/lib/currency";
+import { useCatalogStore } from "@/entities/product";
 import { recordStockMovement } from "@/entities/stock-ledger";
+import { consumeBatchesFefo } from "@/entities/batch";
 import { useSettingsStore } from "@/entities/store-settings";
 import { buildTransaction, cartTotals, useCartStore, useSalesStore, type Payment } from "@/entities/transaction";
 import { BarcodeSearch } from "@/features/add-to-cart";
@@ -63,9 +65,11 @@ export function TillPage() {
       alert(`Gagal menyimpan transaksi: ${String(e)}`);
       return;
     }
-    tx.items.forEach((i) =>
-      recordStockMovement({ productId: i.productId, type: "sale", qty: -i.qty, refType: "transaction", refId: tx.id }),
-    );
+    const products = useCatalogStore.getState().products;
+    tx.items.forEach((i) => {
+      recordStockMovement({ productId: i.productId, type: "sale", qty: -i.qty, refType: "transaction", refId: tx.id });
+      if (products.find((p) => p.id === i.productId)?.trackBatch) consumeBatchesFefo(i.productId, i.qty);
+    });
     useSalesStore.getState().add(tx);
     cart.clear();
     setStep(null);

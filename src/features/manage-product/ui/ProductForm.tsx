@@ -19,6 +19,7 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
   const [stock, setStock] = useState(product?.stock ?? 0);
   const [baseUnit, setBaseUnit] = useState(product?.baseUnit ?? "pcs");
   const [units, setUnits] = useState<ProductUnit[]>(product?.units ?? []);
+  const [trackBatch, setTrackBatch] = useState(product?.trackBatch ?? false);
   const [categoryId, setCategoryId] = useState<string | null>(product?.categoryId ?? null);
   const [barcode, setBarcode] = useState(product?.barcode ?? "");
   const [imagePath, setImagePath] = useState<string | null>(product?.imagePath ?? null);
@@ -51,6 +52,7 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
       units: units
         .filter((u) => u.name.trim() && u.factor > 0)
         .map((u) => ({ name: u.name.trim(), factor: Math.round(u.factor), barcode: u.barcode?.trim() || null })),
+      trackBatch,
       stock: Math.max(0, Math.round(stock)),
       categoryId,
       barcode: barcode.trim() || null,
@@ -181,6 +183,16 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
           </div>
         )}
       </div>
+
+      <label className="flex items-center gap-2 text-sm text-fg">
+        <input
+          type="checkbox"
+          checked={trackBatch}
+          onChange={(e) => setTrackBatch(e.target.checked)}
+          className="accent-[var(--color-primary)]"
+        />
+        Lacak batch &amp; kadaluarsa (FEFO)
+      </label>
 
       <div className="text-sm">
         <span className="text-muted">Foto produk</span>

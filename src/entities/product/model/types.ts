@@ -23,6 +23,8 @@ export interface Product {
   baseUnit: string;
   /** Larger sell/buy units (box, karton, kg) converted via factor. */
   units: ProductUnit[];
+  /** When true, stock is tracked per batch with expiry (FEFO). */
+  trackBatch?: boolean;
   categoryId: string | null;
   /** Units on hand, in base unit. Decrements on sale. */
   stock: number;
