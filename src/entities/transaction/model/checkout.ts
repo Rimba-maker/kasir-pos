@@ -12,6 +12,9 @@ export interface BuildTransactionInput {
   cashierId?: string | null;
   customerId?: string | null;
   shiftId?: string | null;
+  /** Paid now; defaults to the full total (immediate sale). Less = credit sale. */
+  amountPaid?: number;
+  dueDate?: string | null;
   /** Overridable for deterministic tests. */
   id?: string;
   createdAt?: string;
@@ -21,6 +24,8 @@ export interface BuildTransactionInput {
 export function buildTransaction(input: BuildTransactionInput): Transaction {
   const { lines, discountTotal, taxRate, taxInclusive } = input;
   const totals = calcTotals({ items: lines, discountTotal, taxRate, taxInclusive });
+  const amountPaid = input.amountPaid ?? totals.total;
+  const paymentStatus = amountPaid >= totals.total ? "paid" : amountPaid > 0 ? "partial" : "unpaid";
   return {
     id: input.id ?? crypto.randomUUID(),
     createdAt: input.createdAt ?? new Date().toISOString(),
@@ -41,5 +46,8 @@ export function buildTransaction(input: BuildTransactionInput): Transaction {
     taxTotal: totals.taxTotal,
     total: totals.total,
     payment: input.payment,
+    paymentStatus,
+    amountPaid,
+    dueDate: input.dueDate ?? null,
   };
 }

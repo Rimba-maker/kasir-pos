@@ -1,5 +1,7 @@
 export type TransactionStatus = "paid" | "held";
 export type PaymentMethod = "cash" | "qris";
+/** Accounts-receivable status of a completed sale. */
+export type PaymentStatus = "paid" | "partial" | "unpaid";
 
 export interface TransactionItem {
   productId: string;
@@ -40,4 +42,10 @@ export interface Transaction {
   total: number;
   /** null while the transaction is held/unpaid. */
   payment: Payment | null;
+  /** AR status; defaults to "paid" for immediate cash/QRIS sales. */
+  paymentStatus?: PaymentStatus;
+  /** Amount already paid toward this sale (Rupiah). */
+  amountPaid?: number;
+  /** Due date for a credit (tempo) sale, ISO date. */
+  dueDate?: string | null;
 }

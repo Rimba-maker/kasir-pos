@@ -6,7 +6,7 @@ import { recordStockMovement } from "@/entities/stock-ledger";
 import { consumeBatchesFefo } from "@/entities/batch";
 import { currentShift, useShiftStore } from "@/entities/shift";
 import { useSettingsStore } from "@/entities/store-settings";
-import { buildTransaction, cartTotals, useCartStore, useSalesStore, type Payment } from "@/entities/transaction";
+import { buildTransaction, cartTotals, useCartStore, useSalesStore, type Payment, type Transaction } from "@/entities/transaction";
 import { BarcodeSearch } from "@/features/add-to-cart";
 import { holdSale } from "@/features/hold-resume-sale";
 import { CashPaymentPad } from "@/features/pay-cash";
@@ -38,6 +38,7 @@ export function TillPage() {
   const discountTotal = useCartStore((s) => s.discountTotal);
   const taxRate = useCartStore((s) => s.taxRate);
   const taxInclusive = useCartStore((s) => s.taxInclusive);
+  const customerId = useCartStore((s) => s.customerId);
   const setTaxRate = useCartStore((s) => s.setTaxRate);
   const setTaxInclusive = useCartStore((s) => s.setTaxInclusive);
   const { total } = cartTotals({ lines, discountTotal, taxRate, taxInclusive });
@@ -49,18 +50,20 @@ export function TillPage() {
     setTaxInclusive(settings.taxEnabled && settings.taxInclusive);
   }, [settings.taxEnabled, settings.taxRate, settings.taxInclusive, setTaxRate, setTaxInclusive]);
 
-  async function onPaymentConfirmed(payment: Payment) {
+  function saleBase() {
     const cart = useCartStore.getState();
-    const tx = buildTransaction({
+    return {
       lines: cart.lines,
       discountTotal: cart.discountTotal,
       taxRate: cart.taxRate,
       taxInclusive: cart.taxInclusive,
-      status: "paid",
-      payment,
+      status: "paid" as const,
       customerId: cart.customerId,
       shiftId: currentShift(useShiftStore.getState().shifts)?.id ?? null,
-    });
+    };
+  }
+
+  async function finalizeSale(tx: Transaction) {
     try {
       if (isTauri()) await transactionApi.create(tx);
     } catch (e) {
@@ -80,9 +83,19 @@ export function TillPage() {
       if (prod?.trackBatch) consumeBatchesFefo(i.productId, i.qty);
     });
     useSalesStore.getState().add(tx);
-    cart.clear();
+    useCartStore.getState().clear();
     setStep(null);
     setReceipt(buildReceiptData(tx, store));
+  }
+
+  async function onPaymentConfirmed(payment: Payment) {
+    await finalizeSale(buildTransaction({ ...saleBase(), payment }));
+  }
+
+  /** Credit (tempo) sale: nothing paid now, creates a customer receivable. */
+  async function onTempo() {
+    if (!useCartStore.getState().customerId) return;
+    await finalizeSale(buildTransaction({ ...saleBase(), payment: null, amountPaid: 0 }));
   }
 
   async function onHold() {
@@ -183,6 +196,17 @@ export function TillPage() {
             QRIS
           </button>
         </div>
+        {customerId ? (
+          <button
+            type="button"
+            onClick={onTempo}
+            className="mt-3 w-full cursor-pointer rounded-xl border border-dashed border-border py-3 text-sm font-medium text-fg transition-colors hover:border-primary hover:bg-surface-2"
+          >
+            Bayar Tempo (piutang pelanggan)
+          </button>
+        ) : (
+          <p className="mt-3 text-center text-xs text-muted">Pilih pelanggan untuk penjualan tempo.</p>
+        )}
       </Modal>
 
       <Modal open={step === "cash"} title="Pembayaran Tunai" onClose={() => setStep(null)}>
