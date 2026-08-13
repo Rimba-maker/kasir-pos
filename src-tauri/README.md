@@ -31,9 +31,11 @@ pnpm tauri build    # bundle installer
 
 ## Cakupan saat ini
 
-Backend Rust ini baru mencakup **product / category / transaction**. Modul baru
-(supplier, purchase order, stock ledger, opname, batch, shift, promo, loyalty, piutang,
-audit) berjalan di frontend via **zustand + localStorage** dan **belum** punya repository
-SQLite di sini — perluasan menyusul saat `desktop-001` dibuka (Rust + MSVC terpasang).
+Backend Rust ini baru mencakup **product / category / transaction** dalam bentuk MVP —
+field lanjutan produk (harga per tier, multi-satuan, kit, batch, **varian + SKU**) juga
+masih hidup di frontend. Modul baru (supplier, purchase order, stock ledger, opname,
+batch, shift, promo, loyalty, piutang, audit) berjalan di frontend via **zustand +
+localStorage** dan **belum** punya repository SQLite di sini — perluasan menyusul saat
+`desktop-001` dibuka (Rust + MSVC terpasang).
 Pola penambahan: 1 file repo baru di `db/repositories/` + 1 group command, tanpa mengubah
 yang lama (Open/Closed).
