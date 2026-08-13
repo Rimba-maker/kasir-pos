@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import type { Transaction } from "@/entities/transaction";
-import { salesByDay, salesSummary, topProducts } from "./reporting";
+import { paymentBreakdown, salesByDay, salesByHour, salesSummary, topProducts } from "./reporting";
 
 const tx = (over: Partial<Transaction>): Transaction => ({
   id: "t",
@@ -50,9 +50,34 @@ test("topProducts ranks by quantity", () => {
   expect(top[0].qty).toBe(5);
 });
 
-test("salesByDay buckets totals by date", () => {
+test("salesByDay buckets revenue and profit by date", () => {
   expect(salesByDay(transactions)).toEqual([
-    { date: "2026-01-01", total: 100_000 },
-    { date: "2026-01-02", total: 40_000 },
+    { date: "2026-01-01", total: 100_000, profit: 100_000 - 55_000 },
+    { date: "2026-01-02", total: 40_000, profit: 40_000 - 22_500 },
+  ]);
+});
+
+test("salesByHour buckets by local hour, only hours with sales", () => {
+  // Local time (no Z) so getHours() is deterministic regardless of test TZ.
+  const local = [
+    tx({ createdAt: "2026-01-01T09:30:00", total: 30_000 }),
+    tx({ createdAt: "2026-01-01T09:45:00", total: 20_000 }),
+    tx({ createdAt: "2026-01-01T14:00:00", total: 50_000 }),
+  ];
+  expect(salesByHour(local)).toEqual([
+    { hour: 9, label: "09:00", total: 50_000, count: 2 },
+    { hour: 14, label: "14:00", total: 50_000, count: 1 },
+  ]);
+});
+
+test("paymentBreakdown groups by method, biggest first", () => {
+  const paid = [
+    tx({ total: 100_000, payment: { method: "cash", amountPaid: 100_000, change: 0 } }),
+    tx({ total: 40_000, payment: { method: "qris", amountPaid: 40_000, change: 0 } }),
+    tx({ total: 25_000, payment: { method: "cash", amountPaid: 25_000, change: 0 } }),
+  ];
+  expect(paymentBreakdown(paid)).toEqual([
+    { method: "cash", total: 125_000, count: 2 },
+    { method: "qris", total: 40_000, count: 1 },
   ]);
 });
