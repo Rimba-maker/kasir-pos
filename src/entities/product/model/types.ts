@@ -42,6 +42,12 @@ export interface Product {
   /** Preferred supplier, used to group auto-PO suggestions. */
   defaultSupplierId?: string | null;
   categoryId: string | null;
+  /** Stock keeping unit code (optional, unique across products when set). */
+  sku?: string | null;
+  /** Shared label grouping this row with its sibling variants (e.g. "Kaos Polos"). null = standalone. */
+  variantGroup?: string | null;
+  /** This variant's distinguishing label within its group (e.g. "Merah / L"). */
+  variantName?: string | null;
   /** Units on hand, in base unit. Decrements on sale. */
   stock: number;
   barcode: string | null;

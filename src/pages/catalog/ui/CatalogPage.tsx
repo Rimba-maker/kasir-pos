@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { FileDown, FileUp, Pencil, Plus, Tags, Trash2 } from "lucide-react";
-import { StockBadge, sellPrice, useCatalogStore, type Product } from "@/entities/product";
+import { StockBadge, sellPrice, useCatalogStore, variantLabel, type Product } from "@/entities/product";
 import { ProductForm, deleteProduct, deleteProducts } from "@/features/manage-product";
 import { CategoryManager } from "@/features/manage-category";
 import { exportRowsXlsx, importRowsXlsx, productToRow, rowToProduct } from "@/features/export";
@@ -116,7 +116,14 @@ export function CatalogPage() {
                       aria-label={`Pilih ${p.name}`}
                     />
                   </td>
-                  <td className="px-3 py-2.5 font-medium text-fg">{p.name}</td>
+                  <td className="px-3 py-2.5 text-fg">
+                    <span className="font-medium">{variantLabel(p)}</span>
+                    {p.sku && (
+                      <span className="ml-2 rounded bg-surface-2 px-1.5 py-0.5 text-[11px] tabular-nums text-muted">
+                        {p.sku}
+                      </span>
+                    )}
+                  </td>
                   <td className="px-3 py-2.5 text-muted">{categoryName(p.categoryId)}</td>
                   <td className="px-3 py-2.5 text-right tabular-nums text-fg">{formatRupiah(sellPrice(p))}</td>
                   <td className="px-3 py-2.5">

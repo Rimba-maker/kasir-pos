@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ImageIcon, Loader2, Trash2, Upload } from "lucide-react";
 import {
   sellPrice,
+  skuInUse,
   useCatalogStore,
   type Category,
   type KitComponent,
@@ -37,6 +38,9 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
   const suppliers = useSupplierStore((s) => s.suppliers);
   const componentChoices = allProducts.filter((p) => p.id !== product?.id && !p.isKit);
   const [categoryId, setCategoryId] = useState<string | null>(product?.categoryId ?? null);
+  const [sku, setSku] = useState(product?.sku ?? "");
+  const [variantGroup, setVariantGroup] = useState(product?.variantGroup ?? "");
+  const [variantName, setVariantName] = useState(product?.variantName ?? "");
   const [barcode, setBarcode] = useState(product?.barcode ?? "");
   const [imagePath, setImagePath] = useState<string | null>(product?.imagePath ?? null);
   const [loadingImage, setLoadingImage] = useState(false);
@@ -58,10 +62,17 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
+    if (sku.trim() && skuInUse(allProducts, sku, product?.id)) {
+      alert("SKU sudah dipakai produk lain.");
+      return;
+    }
     const cost = Math.max(0, Math.round(costPrice));
     await saveProduct({
       id: product?.id ?? crypto.randomUUID(),
       name: name.trim(),
+      sku: sku.trim() || null,
+      variantGroup: variantGroup.trim() || null,
+      variantName: variantName.trim() || null,
       costPrice: cost > 0 ? cost : null,
       prices: { ...(product?.prices ?? {}), umum: Math.max(0, Math.round(price)) },
       baseUnit: baseUnit.trim() || "pcs",
@@ -155,6 +166,36 @@ export function ProductForm({ product, categories, onDone }: ProductFormProps) {
         <span className="text-muted">Barcode (opsional)</span>
         <input value={barcode} onChange={(e) => setBarcode(e.target.value)} className={field} />
       </label>
+
+      <div className="grid grid-cols-2 gap-3">
+        <label className="block text-sm">
+          <span className="text-muted">SKU (opsional)</span>
+          <input value={sku} onChange={(e) => setSku(e.target.value)} placeholder="KAOS-01" className={field} />
+        </label>
+        <label className="block text-sm">
+          <span className="text-muted">Grup varian (opsional)</span>
+          <input
+            value={variantGroup}
+            onChange={(e) => setVariantGroup(e.target.value)}
+            placeholder="Kaos Polos"
+            className={field}
+          />
+        </label>
+      </div>
+      {variantGroup.trim() && (
+        <label className="block text-sm">
+          <span className="text-muted">Nama varian</span>
+          <input
+            value={variantName}
+            onChange={(e) => setVariantName(e.target.value)}
+            placeholder="Merah / L"
+            className={field}
+          />
+          <span className="mt-1 block text-xs text-muted">
+            Produk dengan grup varian yang sama dikelompokkan jadi satu di kasir; tiap varian punya stok, harga &amp; SKU sendiri.
+          </span>
+        </label>
+      )}
 
       <div className="grid grid-cols-2 gap-3">
         <label className="block text-sm">
