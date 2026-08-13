@@ -7,7 +7,7 @@ Aplikasi **Point of Sale (POS) offline-first** untuk UMKM Indonesia — berjalan
 
 **Kasir & penjualan**
 - Cari/scan barcode, filter kategori, keranjang, diskon, pajak (PPN inclusive/exclusive)
-- Pembayaran tunai (shortcut nominal + kembalian), QRIS statis, **jual tempo (piutang)**
+- Pembayaran tunai — **pecahan Rupiah asli (uang kertas + koin), ditekan bertambah** untuk uang non-pas + kembalian; QRIS statis; **jual tempo (piutang)**
 - **Promo otomatis** (diskon %, nominal, grosir-qty, bundle, beli-X-gratis-Y)
 - Hold / resume transaksi · cetak struk thermal (ESC/POS)
 - **Shift kasir** — buka/tutup + rekonsiliasi kas (opsional)
@@ -15,6 +15,7 @@ Aplikasi **Point of Sale (POS) offline-first** untuk UMKM Indonesia — berjalan
 **Katalog & inventaris**
 - CRUD produk & kategori, foto, bulk delete, **import/export Excel**
 - Multi-harga per tier (umum/grosir), harga beli, **multi-satuan** (pcs/box/kg)
+- **Varian produk + SKU** — satu produk banyak varian (ukuran/warna), tiap varian punya harga, stok & SKU sendiri
 - **Stock ledger** (riwayat mutasi), **stok opname**, **batch/expiry (FEFO)**, **produk paket/kit**
 - **Reorder point** + notif stok menipis + saran draft PO
 
@@ -26,10 +27,10 @@ Aplikasi **Point of Sale (POS) offline-first** untuk UMKM Indonesia — berjalan
 - Master pelanggan (tier harga, segmen), **poin + tier member + voucher**
 
 **Laporan & admin**
-- **Dashboard** (KPI, laba kotor, grafik tren & terlaris) + export PDF
+- **Dashboard** — KPI (omzet, laba kotor, rata-rata/transaksi), tren omzet & laba, donut metode bayar, jam ramai, produk terlaris + export PDF
 - Riwayat transaksi, staff **RBAC** (role preset) + **audit log**
 - **Backup** ekspor/impor JSON (semua modul)
-- **Responsif** + tema terang/gelap
+- **Responsif** — nav mobile ringkas (menu utama + sheet "Lainnya"), keranjang bottom-sheet, tema terang/gelap
 
 ## Menjalankan
 
