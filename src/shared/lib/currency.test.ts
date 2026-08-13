@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { formatRupiah } from "./currency";
+import { formatRupiah, formatRupiahShort } from "./currency";
 
 test("formats with thousands grouping", () => {
   expect(formatRupiah(10_000)).toBe("Rp10.000");
@@ -13,4 +13,11 @@ test("handles zero and negatives (change/refund)", () => {
 
 test("rounds floats to whole Rupiah", () => {
   expect(formatRupiah(9_999.6)).toBe("Rp10.000");
+});
+
+test("formatRupiahShort compacts thousands, leaves coins whole", () => {
+  expect(formatRupiahShort(100_000)).toBe("100rb");
+  expect(formatRupiahShort(1_000)).toBe("1rb");
+  expect(formatRupiahShort(500)).toBe("500");
+  expect(formatRupiahShort(100)).toBe("100");
 });
